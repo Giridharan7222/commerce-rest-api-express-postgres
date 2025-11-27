@@ -1,0 +1,34 @@
+paths:
+  /api/users/profile:
+    post:
+      summary: Create user profile
+      tags: [Profiles]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfile"
+      responses:
+        "201":
+          description: Profile created successfully
+
+  /api/users/{id}/profile:
+    put:
+      summary: Update user profile
+      tags: [Profiles]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfile"
+      responses:
+        "200":
+          description: Profile updated successfully

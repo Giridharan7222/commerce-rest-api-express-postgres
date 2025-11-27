@@ -1,0 +1,61 @@
+paths:
+  /api/users/addresses:
+    post:
+      summary: Create user address
+      tags: [Addresses]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Address"
+      responses:
+        "201":
+          description: Address created successfully
+
+  /api/users/{id}/addresses:
+    get:
+      summary: Get user addresses
+      tags: [Addresses]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of user addresses
+
+  /api/addresses/{id}:
+    put:
+      summary: Update address
+      tags: [Addresses]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Address"
+      responses:
+        "200":
+          description: Address updated successfully
+
+    delete:
+      summary: Delete address
+      tags: [Addresses]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Address deleted successfully

@@ -27,13 +27,11 @@ import { authenticateToken, requireRole } from "../middleware/auth";
 
 export const userRoutes = express.Router();
 
-// Authentication
+// Authentication routes
 userRoutes.post("/login", checkSchema(loginSchema), login);
-
-// Public user registration (customers only)
 userRoutes.post("/signup", checkSchema(createUserSchema), createUserAccount);
 
-// Admin-only user management
+// Admin user management
 userRoutes.post(
   "/users/create-admin",
   authenticateToken,
@@ -74,7 +72,7 @@ userRoutes.put(
   updateUserProfileController,
 );
 
-// Address CRUD operations
+// Address management
 userRoutes.post(
   "/users/addresses",
   checkSchema(createAddressSchema),

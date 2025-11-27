@@ -8,6 +8,7 @@ import { limiter } from "./middleware/limiter";
 import { errorHandler404 } from "./middleware/errorHandler404";
 import { errorHandler } from "./middleware/errorHandler";
 import { responseHandler } from "./middleware/responseHandler";
+import { setupSwagger } from "./swagger";
 
 const app = express();
 
@@ -20,7 +21,27 @@ app.use(log);
 app.use(helmet());
 app.use(limiter);
 
-// Health check route
+// Swagger documentation
+setupSwagger(app);
+
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Health check endpoint
+ *     tags: [Health]
+ *     responses:
+ *       200:
+ *         description: Service is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: ok
+ */
 app.get("/health", (req, res) => {
   res.json({ status: "ok" });
 });

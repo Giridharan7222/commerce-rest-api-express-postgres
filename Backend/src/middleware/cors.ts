@@ -8,20 +8,9 @@ const allowedOrigins: string[] = (process.env.ALLOWED_ORIGINS || "")
   .map((o) => o.trim())
   .filter(Boolean);
 
-export const corsOptionsDelegate: CorsOptionsDelegate<Request> = (
-  req,
-  callback,
-) => {
-  const origin = req.header("Origin");
-
-  if (!origin || allowedOrigins.includes(origin)) {
-    callback(null, {
-      origin: true,
-      credentials: true,
-      methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-    });
-  } else {
-    callback(new Error("Not allowed by CORS"));
-  }
+export const corsOptionsDelegate: CorsOptions = {
+  origin: true,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
 };
