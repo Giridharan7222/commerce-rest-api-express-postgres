@@ -1,0 +1,24 @@
+services:
+  postgres:
+    env_file: ./env/local/local.env
+    image: postgis/postgis:16-3.5
+    platform: linux/amd64
+    ports:
+      - "54321:5432"
+    networks:
+      - db-net
+    security_opt:
+      - seccomp:unconfined
+
+  migrator:
+    env_file: ./env/local/local.env
+    build:
+      context: .
+      dockerfile: ./env/Dockerfile
+    networks:
+      - db-net
+
+networks:
+  db-net:
+    external: false
+    name: db-net
