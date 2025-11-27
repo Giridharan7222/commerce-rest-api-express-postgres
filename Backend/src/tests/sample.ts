@@ -1,4 +1,7 @@
-export function maxSubArray(a: number[], k: number): { max: number; bestSlice: number[] } {
+export function maxSubArray(
+  a: number[],
+  k: number,
+): { max: number; bestSlice: number[] } {
   const l = a.length;
   if (k > l) {
     return { max: -1, bestSlice: [] };
@@ -26,4 +29,3 @@ export function maxSubArray(a: number[], k: number): { max: number; bestSlice: n
 
   return { max, bestSlice };
 }
-

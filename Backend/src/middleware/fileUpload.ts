@@ -1,13 +1,13 @@
-import multer from 'multer';
-import path from 'path';
+import multer from "multer";
+import path from "path";
 
 // 1️⃣ Storage configuration
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // folder where files will be saved
+    cb(null, "uploads/"); // folder where files will be saved
   },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + '-' + file.originalname);
+    cb(null, Date.now() + "-" + file.originalname);
   },
 });
 
@@ -18,7 +18,7 @@ const fileFilter = (req: any, file: any, cb: any) => {
   if (allowedTypes.test(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('File type not allowed'), false);
+    cb(new Error("File type not allowed"), false);
   }
 };
 

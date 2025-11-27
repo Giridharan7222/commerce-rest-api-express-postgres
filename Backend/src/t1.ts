@@ -31,7 +31,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 const uploadFileToS3 = async (
   buffer: Buffer,
   fileName: string,
-  mimeType: string
+  mimeType: string,
 ) => {
   const command = new PutObjectCommand({
     Bucket: process.env.AWS_BUCKET_NAME!,
@@ -48,31 +48,34 @@ const uploadFileToS3 = async (
 // ----------------------
 // ROUTE
 // ----------------------
-uploadRoutes.post("/upload", upload.single("file"), async (req: Request, res: Response) => {
-  try {
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded!" });
+uploadRoutes.post(
+  "/upload",
+  upload.single("file"),
+  async (req: Request, res: Response) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded!" });
+      }
+
+      const file = req.file;
+
+      const url = await uploadFileToS3(
+        file.buffer,
+        file.originalname,
+        file.mimetype,
+      );
+
+      return res.json({
+        message: "File uploaded successfully!",
+        url,
+      });
+    } catch (err: any) {
+      return res.status(500).json({
+        message: "Upload failed",
+        error: err.message,
+      });
     }
-
-    const file = req.file;
-
-    const url = await uploadFileToS3(
-      file.buffer,
-      file.originalname,
-      file.mimetype
-    );
-
-    return res.json({
-      message: "File uploaded successfully!",
-      url,
-    });
-
-  } catch (err: any) {
-    return res.status(500).json({
-      message: "Upload failed",
-      error: err.message,
-    });
-  }
-});
+  },
+);
 
 export default uploadRoutes;

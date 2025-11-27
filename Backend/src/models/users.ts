@@ -1,31 +1,30 @@
-import 'reflect-metadata';
+import "reflect-metadata";
 import {
   Table,
   Column,
   Model,
   PrimaryKey,
-  AutoIncrement,
   AllowNull,
   DataType,
-  ForeignKey,
-  BelongsTo,
-  HasMany,
-  HasOne,
   Default,
   CreatedAt,
   UpdatedAt,
-} from 'sequelize-typescript';
-import { nanoid } from 'nanoid';
+  HasOne,
+  HasMany,
+} from "sequelize-typescript";
+import CustomerProfile from "./customerProfile";
+import AdminProfile from "./adminProfile";
+import Address from "./address";
 
 @Table({
-  tableName: 'users',
-  modelName: 'User',
+  tableName: "users",
+  modelName: "User",
 })
 export default class User extends Model {
   @PrimaryKey
   @Column({
-    type: DataType.CHAR(21),
-    defaultValue: () => nanoid(),
+    type: DataType.UUID,
+    defaultValue: DataType.UUIDV4,
   })
   id!: string;
 
@@ -44,29 +43,30 @@ export default class User extends Model {
 
   @AllowNull(false)
   @Column({
-    type: DataType.STRING,
+    type: DataType.ENUM("admin", "customer"),
   })
-  first_name!: string;
+  role!: "admin" | "customer";
 
-  @AllowNull(false)
+  @Default(true)
   @Column({
-    type: DataType.STRING,
+    type: DataType.BOOLEAN,
   })
-  last_name!: string;
+  is_active!: boolean;
 
-  @Default('user')
-  @AllowNull(false)
-  @Column({
-    type: DataType.ENUM('user', 'admin'),
-  })
-  role!: string;
-
-  // ✅ Timestamps
   @CreatedAt
-  @Column({ field: 'created_at', type: DataType.DATE })
+  @Column({ field: "created_at", type: DataType.DATE })
   created_at!: Date;
 
   @UpdatedAt
-  @Column({ field: 'updated_at', type: DataType.DATE })
+  @Column({ field: "updated_at", type: DataType.DATE })
   updated_at!: Date;
+
+  @HasOne(() => CustomerProfile)
+  customerProfile!: CustomerProfile;
+
+  @HasOne(() => AdminProfile)
+  adminProfile!: AdminProfile;
+
+  @HasMany(() => Address)
+  addresses!: Address[];
 }

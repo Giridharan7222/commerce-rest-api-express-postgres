@@ -22,17 +22,16 @@ Output: max = 25, slice = [1, 7, 9, 2]
 
 import { maxSubArray } from "./sample";
 
-describe("maxSubArray",()=>{
-
-test("should return correct max sum and slice for normal case", () => {
+describe("maxSubArray", () => {
+  test("should return correct max sum and slice for normal case", () => {
     const res = maxSubArray([1, 2, 3, 4, 5], 3);
-    expect(res.max).toBe(12);                 // 3+4+5
+    expect(res.max).toBe(12); // 3+4+5
     expect(res.bestSlice).toEqual([3, 4, 5]);
   });
 
   test("should return first window if it is the max", () => {
     const res = maxSubArray([10, 1, 1, 1], 2);
-    expect(res.max).toBe(11);                 // 10+1
+    expect(res.max).toBe(11); // 10+1
     expect(res.bestSlice).toEqual([10, 1]);
   });
 
@@ -44,13 +43,13 @@ test("should return correct max sum and slice for normal case", () => {
 
   test("should handle array with negative numbers", () => {
     const res = maxSubArray([-5, -2, -1, -7], 2);
-    expect(res.max).toBe(-3);                 // -2 + -1
+    expect(res.max).toBe(-3); // -2 + -1
     expect(res.bestSlice).toEqual([-2, -1]);
   });
 
   test("should handle array where max occurs in middle", () => {
     const res = maxSubArray([2, 1, 5, 2, 1], 2);
-    expect(res.max).toBe(7);                  // 5 + 2
+    expect(res.max).toBe(7); // 5 + 2
     expect(res.bestSlice).toEqual([5, 2]);
   });
 
@@ -65,5 +64,4 @@ test("should return correct max sum and slice for normal case", () => {
     expect(res.max).toBe(15);
     expect(res.bestSlice).toEqual([4, 5, 6]);
   });
-
-})
+});

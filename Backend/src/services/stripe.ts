@@ -1,11 +1,11 @@
-import Stripe from 'stripe';
+import Stripe from "stripe";
 
 class StripeService {
   private stripe: Stripe;
 
   constructor() {
     this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: '2024-11-20.acacia',
+      apiVersion: "2024-11-20.acacia",
     });
   }
 
@@ -18,7 +18,9 @@ class StripeService {
   }
 
   async retrieveCustomer(customerId: string): Promise<Stripe.Customer> {
-    return await this.stripe.customers.retrieve(customerId) as Stripe.Customer;
+    return (await this.stripe.customers.retrieve(
+      customerId,
+    )) as Stripe.Customer;
   }
 
   // 2. Card Management
@@ -28,20 +30,28 @@ class StripeService {
     });
   }
 
-  async getCustomerCards(customerId: string): Promise<Stripe.ApiList<Stripe.PaymentMethod>> {
+  async getCustomerCards(
+    customerId: string,
+  ): Promise<Stripe.ApiList<Stripe.PaymentMethod>> {
     return await this.stripe.paymentMethods.list({
       customer: customerId,
-      type: 'card',
+      type: "card",
     });
   }
 
-  async attachPaymentMethod(paymentMethodId: string, customerId: string): Promise<Stripe.PaymentMethod> {
+  async attachPaymentMethod(
+    paymentMethodId: string,
+    customerId: string,
+  ): Promise<Stripe.PaymentMethod> {
     return await this.stripe.paymentMethods.attach(paymentMethodId, {
       customer: customerId,
     });
   }
 
-  async setDefaultPaymentMethod(customerId: string, paymentMethodId: string): Promise<Stripe.Customer> {
+  async setDefaultPaymentMethod(
+    customerId: string,
+    paymentMethodId: string,
+  ): Promise<Stripe.Customer> {
     return await this.stripe.customers.update(customerId, {
       invoice_settings: { default_payment_method: paymentMethodId },
     });
@@ -50,9 +60,9 @@ class StripeService {
   // 3. Payment Handling
   async createPaymentIntent(
     amount: number,
-    currency: string = 'inr',
+    currency: string = "inr",
     customerId?: string,
-    paymentMethodId?: string
+    paymentMethodId?: string,
   ): Promise<Stripe.PaymentIntent> {
     const params: Stripe.PaymentIntentCreateParams = {
       amount,
@@ -68,7 +78,7 @@ class StripeService {
 
   async confirmPaymentIntent(
     intentId: string,
-    paymentMethodId: string
+    paymentMethodId: string,
   ): Promise<Stripe.PaymentIntent> {
     return await this.stripe.paymentIntents.confirm(intentId, {
       payment_method: paymentMethodId,
@@ -83,7 +93,7 @@ class StripeService {
   async createRefund(
     paymentIntentId: string,
     amount?: number,
-    reason?: string
+    reason?: string,
   ): Promise<Stripe.Refund> {
     const params: Stripe.RefundCreateParams = {
       payment_intent: paymentIntentId,
@@ -119,7 +129,7 @@ class StripeService {
     return this.stripe.webhooks.constructEvent(
       payload,
       signature,
-      process.env.STRIPE_WEBHOOK_SECRET!
+      process.env.STRIPE_WEBHOOK_SECRET!,
     );
   }
 }
