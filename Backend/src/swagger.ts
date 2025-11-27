@@ -8,13 +8,57 @@ const options = {
     info: {
       title: "Commerce API",
       version: "1.0.0",
-      description: "E-commerce REST API with Express and PostgreSQL",
+      description: `
+# 🛍️ E-commerce REST API with Express and PostgreSQL
+
+## 📖 Quick Navigation
+- **[API Flows & Integration Guide](#tag/API-Flows)** - Complete user journey flowcharts
+- **[Authentication](#tag/Authentication)** - Login/Signup endpoints
+- **[Products](#tag/Products)** - Product management (Admin)
+- **[Categories](#tag/Categories)** - Category management (Admin) 
+- **[Cart](#tag/Cart)** - Shopping cart operations (Customer)
+- **[Orders](#tag/Orders)** - Order management
+
+## 🚀 Getting Started
+1. Create an account using \`POST /api/signup\`
+2. Login with \`POST /api/login\` to get JWT token
+3. Use token in Authorization header: \`Bearer <token>\`
+4. Follow the API flows below based on your role (Admin/Customer)
+
+---
+      `,
     },
     servers: [
       {
         url: "http://localhost:5005",
         description: "Development server",
       },
+    ],
+    tags: [
+      {
+        name: "API Flows",
+        description: "Complete integration guide with user journey flowcharts for Admin and Customer workflows"
+      },
+      {
+        name: "Authentication", 
+        description: "User registration and login endpoints"
+      },
+      {
+        name: "Products",
+        description: "Product management operations (Admin access required)"
+      },
+      {
+        name: "Categories",
+        description: "Product category management (Admin access required)"
+      },
+      {
+        name: "Cart",
+        description: "Shopping cart operations (Customer access required)"
+      },
+      {
+        name: "Orders",
+        description: "Order management and tracking"
+      }
     ],
     components: {
       securitySchemes: {
@@ -115,6 +159,7 @@ const options = {
     },
   },
   apis: [
+    "./src/docs/swagger/api-flows.swagger.yaml",
     "./src/docs/swagger/auth.swagger.yaml",
     "./src/docs/swagger/user.swagger.yaml",
     "./src/docs/swagger/profile.swagger.yaml",
@@ -131,12 +176,34 @@ const options = {
 const specs = swaggerJsdoc(options);
 
 export const setupSwagger = (app: Express) => {
+  const customCss = `
+    .swagger-ui .topbar { display: none }
+    .swagger-ui .info { margin-bottom: 30px; }
+    .swagger-ui .info .title { color: #2c3e50; font-size: 2.5em; }
+    .swagger-ui .info .description { font-size: 1.1em; line-height: 1.6; }
+    .swagger-ui .opblock-tag { font-size: 1.2em; font-weight: bold; }
+    .swagger-ui .opblock.opblock-post { border-color: #49cc90; }
+    .swagger-ui .opblock.opblock-get { border-color: #61affe; }
+    .swagger-ui .opblock.opblock-put { border-color: #fca130; }
+    .swagger-ui .opblock.opblock-delete { border-color: #f93e3e; }
+    .swagger-ui .scheme-container { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 20px 0; }
+  `;
+
   app.use(
     "/api-docs",
     swaggerUi.serve,
     swaggerUi.setup(specs, {
       explorer: true,
-      customCss: ".swagger-ui .topbar { display: none }",
+      customCss,
+      customSiteTitle: "Commerce API Documentation",
+      customfavIcon: "/favicon.ico",
+      swaggerOptions: {
+        tagsSorter: "alpha",
+        operationsSorter: "alpha",
+        docExpansion: "none",
+        filter: true,
+        showRequestHeaders: true,
+      },
     }),
   );
 };

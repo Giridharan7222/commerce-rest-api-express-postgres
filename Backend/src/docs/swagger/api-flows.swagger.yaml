@@ -1,0 +1,264 @@
+# This file is included in the main Swagger documentation
+# It provides comprehensive API flows and integration guides
+  description: |
+    # 🚀 Commerce API Integration Guide
+    
+    This guide provides comprehensive API flows for both **Admin** and **Customer** user journeys.
+    
+    ## 📋 Quick Start Guide
+    
+    ### 🔐 Authentication Flow
+    ```
+    1. Create Account: POST /api/signup
+    2. Login: POST /api/login (returns JWT token)
+    3. Use token in Authorization header: "Bearer <token>"
+    ```
+    
+    ---
+    
+    ## 👨‍💼 ADMIN FLOW CHART
+    
+    ```mermaid
+    graph TD
+        A[Start] --> B[POST /api/signup<br/>Create Admin Account]
+        B --> C[POST /api/login<br/>Admin Login]
+        C --> D[Receive JWT Token]
+        D --> E[Set Authorization Header<br/>Bearer token]
+        
+        E --> F[📦 Product Management]
+        F --> G[POST /api/categories<br/>Create Categories]
+        G --> H[POST /api/products<br/>Create Products]
+        H --> I[POST /api/products/upload<br/>Upload Product Images]
+        
+        F --> J[📝 Product Operations]
+        J --> K[GET /api/products<br/>View All Products]
+        J --> L[PUT /api/products/{id}<br/>Update Product]
+        J --> M[DELETE /api/products/{id}<br/>Delete Product]
+        
+        F --> N[📊 Order Management]
+        N --> O[GET /api/orders<br/>View All Orders]
+        N --> P[PATCH /api/orders/{id}/status<br/>Update Order Status]
+        
+        style A fill:#e1f5fe
+        style F fill:#f3e5f5
+        style J fill:#e8f5e8
+        style N fill:#fff3e0
+    ```
+    
+    ---
+    
+    ## 🛒 CUSTOMER FLOW CHART
+    
+    ```mermaid
+    graph TD
+        A[Start] --> B[POST /api/signup<br/>Create Customer Account]
+        B --> C[POST /api/login<br/>Customer Login]
+        C --> D[Receive JWT Token]
+        D --> E[Set Authorization Header<br/>Bearer token]
+        
+        E --> F[🏪 Browse Products]
+        F --> G[GET /api/products<br/>View Products]
+        F --> H[GET /api/products?search=laptop<br/>Search Products]
+        F --> I[GET /api/products/{id}<br/>View Product Details]
+        
+        I --> J[🛒 Shopping Cart]
+        J --> K[POST /api/cart<br/>Add to Cart]
+        K --> L[GET /api/cart<br/>View Cart]
+        L --> M[PUT /api/cart/{productId}<br/>Update Quantity]
+        L --> N[DELETE /api/cart/{productId}<br/>Remove Item]
+        
+        L --> O[📋 Checkout Process]
+        O --> P[POST /api/orders<br/>Create Order]
+        P --> Q[💳 Payment Process]
+        Q --> R[Order Confirmation]
+        
+        R --> S[📦 Order Tracking]
+        S --> T[GET /api/orders<br/>View Order History]
+        S --> U[GET /api/orders/{id}<br/>Track Specific Order]
+        S --> V[PATCH /api/orders/{id}/cancel<br/>Cancel Order]
+        
+        style A fill:#e1f5fe
+        style F fill:#f3e5f5
+        style J fill:#e8f5e8
+        style O fill:#fff3e0
+        style S fill:#fce4ec
+    ```
+    
+    ---
+    
+    ## 🔄 Complete API Integration Sequence
+    
+    ### 1️⃣ **Account Creation & Authentication**
+    | Step | Method | Endpoint | Description |
+    |------|--------|----------|-------------|
+    | 1 | `POST` | `/api/signup` | Create new account (admin/customer) |
+    | 2 | `POST` | `/api/login` | Login and get JWT token |
+    
+    ### 2️⃣ **Admin Product Management Sequence**
+    | Step | Method | Endpoint | Description | Auth Required |
+    |------|--------|----------|-------------|---------------|
+    | 1 | `POST` | `/api/categories` | Create product categories | ✅ Admin |
+    | 2 | `POST` | `/api/products` | Create products | ✅ Admin |
+    | 3 | `POST` | `/api/products/upload` | Upload product with images | ✅ Admin |
+    | 4 | `PUT` | `/api/products/{id}` | Update product details | ✅ Admin |
+    | 5 | `DELETE` | `/api/products/{id}` | Remove products | ✅ Admin |
+    
+    ### 3️⃣ **Customer Shopping Sequence**
+    | Step | Method | Endpoint | Description | Auth Required |
+    |------|--------|----------|-------------|---------------|
+    | 1 | `GET` | `/api/products` | Browse all products | ❌ |
+    | 2 | `GET` | `/api/products?search=term` | Search products | ❌ |
+    | 3 | `GET` | `/api/products/{id}` | View product details | ❌ |
+    | 4 | `POST` | `/api/cart` | Add product to cart | ✅ Customer |
+    | 5 | `GET` | `/api/cart` | View cart contents | ✅ Customer |
+    | 6 | `PUT` | `/api/cart/{productId}` | Update cart quantities | ✅ Customer |
+    | 7 | `POST` | `/api/orders` | Create order from cart | ✅ Customer |
+    | 8 | `GET` | `/api/orders` | View order history | ✅ Customer |
+    
+    ### 4️⃣ **Order Management Sequence**
+    | Step | Method | Endpoint | Description | Auth Required |
+    |------|--------|----------|-------------|---------------|
+    | 1 | `GET` | `/api/orders` | View orders (admin: all, customer: own) | ✅ |
+    | 2 | `GET` | `/api/orders/{id}` | Get specific order details | ✅ |
+    | 3 | `PATCH` | `/api/orders/{id}/status` | Update order status | ✅ Admin |
+    | 4 | `PATCH` | `/api/orders/{id}/cancel` | Cancel order | ✅ Customer |
+    
+    ---
+    
+    ## 🎯 API Usage Examples
+    
+    ### **Admin Workflow Example**
+    ```bash
+    # 1. Create admin account
+    curl -X POST http://localhost:5005/api/signup \
+      -H "Content-Type: application/json" \
+      -d '{"email":"admin@example.com","password":"admin123","role":"admin"}'
+    
+    # 2. Login as admin
+    curl -X POST http://localhost:5005/api/login \
+      -H "Content-Type: application/json" \
+      -d '{"email":"admin@example.com","password":"admin123"}'
+    
+    # 3. Create category (use token from login)
+    curl -X POST http://localhost:5005/api/categories \
+      -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"name":"Electronics","description":"Electronic devices"}'
+    
+    # 4. Create product
+    curl -X POST http://localhost:5005/api/products \
+      -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"name":"iPhone 15","price":999.99,"categoryId":"CATEGORY_ID"}'
+    ```
+    
+    ### **Customer Workflow Example**
+    ```bash
+    # 1. Create customer account
+    curl -X POST http://localhost:5005/api/signup \
+      -H "Content-Type: application/json" \
+      -d '{"email":"customer@example.com","password":"customer123"}'
+    
+    # 2. Login as customer
+    curl -X POST http://localhost:5005/api/login \
+      -H "Content-Type: application/json" \
+      -d '{"email":"customer@example.com","password":"customer123"}'
+    
+    # 3. Browse products
+    curl -X GET http://localhost:5005/api/products
+    
+    # 4. Add to cart
+    curl -X POST http://localhost:5005/api/cart \
+      -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"productId":"PRODUCT_ID","quantity":2}'
+    
+    # 5. Create order
+    curl -X POST http://localhost:5005/api/orders \
+      -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{"shippingAddress":{"full_name":"John Doe","phone":"+1234567890","address_line1":"123 Main St","city":"New York","state":"NY","pincode":"10001","country":"USA"}}'
+    ```
+    
+    ---
+    
+    ## 🔒 Authentication & Authorization
+    
+    ### **JWT Token Usage**
+    - All protected endpoints require: `Authorization: Bearer <jwt_token>`
+    - Token expires after configured time (check your JWT settings)
+    - Admin role required for product/category management
+    - Customer role for cart and order operations
+    
+    ### **Role-Based Access**
+    | Endpoint Category | Admin Access | Customer Access | Public Access |
+    |-------------------|--------------|-----------------|---------------|
+    | Product Management | ✅ Full CRUD | ❌ | ❌ |
+    | Product Browsing | ✅ | ✅ | ✅ |
+    | Cart Operations | ✅ | ✅ | ❌ |
+    | Order Management | ✅ All orders | ✅ Own orders | ❌ |
+    | Order Status Update | ✅ | ❌ | ❌ |
+    
+    ---
+    
+    ## 📱 Frontend Integration Tips
+    
+    ### **State Management Flow**
+    1. **Authentication State**: Store JWT token securely
+    2. **Product State**: Cache product listings for better UX
+    3. **Cart State**: Sync with backend on each operation
+    4. **Order State**: Track order status changes
+    
+    ### **Error Handling**
+    - `401`: Token expired or invalid → Redirect to login
+    - `403`: Insufficient permissions → Show access denied
+    - `404`: Resource not found → Show not found page
+    - `400`: Validation errors → Show form errors
+    
+    ### **Performance Optimization**
+    - Use product filtering/pagination: `GET /api/products?page=1&limit=10`
+    - Implement search with debouncing: `GET /api/products?search=term`
+    - Cache category data (changes infrequently)
+    
+    ---
+    
+    ## 🚨 Important Notes
+    
+    ⚠️ **Security Considerations**
+    - Always validate JWT tokens on protected routes
+    - Implement rate limiting for authentication endpoints
+    - Use HTTPS in production
+    - Sanitize all user inputs
+    
+    ⚠️ **Business Logic**
+    - Check product stock before adding to cart
+    - Validate cart contents before order creation
+    - Handle payment failures gracefully
+    - Implement order cancellation time limits
+    
+    ⚠️ **Data Consistency**
+    - Cart items may become invalid if products are deleted
+    - Product prices in cart vs. current prices
+    - Order status transitions should follow business rules
+
+paths:
+  /api-flows:
+    get:
+      tags: ["API Flows"]
+      summary: "📋 Complete API Integration Guide"
+      description: |
+        This endpoint provides the complete API integration guide with flowcharts.
+        
+        **Note**: This is a documentation-only endpoint and does not exist in the actual API.
+        Use the information above to integrate with the real API endpoints.
+      responses:
+        "200":
+          description: "Documentation endpoint - not implemented"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "This is a documentation-only endpoint. Please refer to the API flows above."
