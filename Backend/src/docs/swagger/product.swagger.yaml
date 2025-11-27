@@ -1,0 +1,495 @@
+paths:
+  /api/categories:
+    post:
+      summary: Create a new category (Admin only)
+      tags: [Categories]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  example: "Electronics"
+                description:
+                  type: string
+                  example: "Electronic devices and gadgets"
+      responses:
+        "201":
+          description: Category created successfully
+        "400":
+          description: Validation error
+        "403":
+          description: Access denied
+
+    get:
+      summary: Get all categories
+      tags: [Categories]
+      responses:
+        "200":
+          description: List of categories
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Category"
+
+  /api/categories/{id}:
+    get:
+      summary: Get category by ID
+      tags: [Categories]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Category details
+        "404":
+          description: Category not found
+
+    put:
+      summary: Update category (Admin only)
+      tags: [Categories]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+      responses:
+        "200":
+          description: Category updated successfully
+        "404":
+          description: Category not found
+        "403":
+          description: Access denied
+
+    delete:
+      summary: Delete category (Admin only)
+      tags: [Categories]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Category deleted successfully
+        "404":
+          description: Category not found
+        "403":
+          description: Access denied
+
+  /api/products:
+    post:
+      summary: Create a new product (Admin only)
+      tags: [Products]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+                - categoryId
+              properties:
+                name:
+                  type: string
+                  example: "iPhone 15 Pro"
+                description:
+                  type: string
+                  example: "Latest Apple smartphone"
+                price:
+                  type: number
+                  example: 999.99
+                stock:
+                  type: integer
+                  example: 50
+                categoryId:
+                  type: string
+                  format: uuid
+                imageUrl:
+                  type: string
+                  format: uri
+                cloudinaryPublicId:
+                  type: string
+                isActive:
+                  type: boolean
+                  default: true
+      responses:
+        "201":
+          description: Product created successfully
+        "400":
+          description: Validation error
+        "403":
+          description: Access denied
+
+    get:
+      summary: Get all products
+      tags: [Products]
+      responses:
+        "200":
+          description: List of products
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Product"
+
+  /api/products/upload:
+    post:
+      summary: Create product with file uploads (Admin only)
+      tags: [Products]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+                - categoryId
+              properties:
+                name:
+                  type: string
+                  example: "iPhone 15 Pro"
+                description:
+                  type: string
+                  example: "Latest Apple smartphone"
+                price:
+                  type: number
+                  example: 999.99
+                stock:
+                  type: integer
+                  example: 50
+                categoryId:
+                  type: string
+                  format: uuid
+                isActive:
+                  type: boolean
+                  default: true
+                mainImage:
+                  type: string
+                  format: binary
+                  description: "Main product image (max 1 file)"
+                additionalImages:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: "Additional product images (max 10 files)"
+      responses:
+        "201":
+          description: Product created successfully with uploaded images
+        "400":
+          description: Validation error or upload failed
+        "403":
+          description: Access denied
+
+  /api/products/{id}:
+    get:
+      summary: Get product by ID
+      tags: [Products]
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Product details
+        "404":
+          description: Product not found
+
+    put:
+      summary: Update product (Admin only)
+      tags: [Products]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                stock:
+                  type: integer
+                categoryId:
+                  type: string
+                  format: uuid
+                imageUrl:
+                  type: string
+                  format: uri
+                cloudinaryPublicId:
+                  type: string
+                isActive:
+                  type: boolean
+      responses:
+        "200":
+          description: Product updated successfully
+        "404":
+          description: Product not found
+        "403":
+          description: Access denied
+
+    delete:
+      summary: Delete product (Admin only)
+      tags: [Products]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Product deleted successfully
+        "404":
+          description: Product not found
+        "403":
+          description: Access denied
+
+  /api/product-images:
+    post:
+      summary: Create product image (Admin only)
+      tags: [Product Images]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - productId
+                - imageUrl
+              properties:
+                productId:
+                  type: string
+                  format: uuid
+                imageUrl:
+                  type: string
+                  format: uri
+                publicId:
+                  type: string
+      responses:
+        "201":
+          description: Product image created successfully
+        "400":
+          description: Validation error
+        "403":
+          description: Access denied
+
+  /api/products/{productId}/images:
+    get:
+      summary: Get product images
+      tags: [Product Images]
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: List of product images
+        "404":
+          description: Product not found
+
+  /api/product-images/{id}:
+    put:
+      summary: Update product image (Admin only)
+      tags: [Product Images]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                imageUrl:
+                  type: string
+                  format: uri
+                publicId:
+                  type: string
+      responses:
+        "200":
+          description: Product image updated successfully
+        "404":
+          description: Product image not found
+        "403":
+          description: Access denied
+
+    delete:
+      summary: Delete product image (Admin only)
+      tags: [Product Images]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Product image deleted successfully
+        "404":
+          description: Product image not found
+        "403":
+          description: Access denied
+
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stock:
+          type: integer
+        categoryId:
+          type: string
+          format: uuid
+        imageUrl:
+          type: string
+          format: uri
+        cloudinaryPublicId:
+          type: string
+        isActive:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        category:
+          $ref: "#/components/schemas/Category"
+        productImages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductImage"
+
+    ProductImage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        imageUrl:
+          type: string
+          format: uri
+        publicId:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time

@@ -3,6 +3,7 @@ import sequelize from "../database/connection";
 import { User } from "../models";
 import { createUser } from "../services/user";
 import { CreateUserDto } from "../dtos/user";
+import { UserRole } from "../enums/user";
 
 describe("User Service - Create User", () => {
   beforeEach(async () => {
@@ -13,7 +14,7 @@ describe("User Service - Create User", () => {
     const userData: CreateUserDto = {
       email: "test@example.com",
       password: "TestPass123!",
-      role: "customer",
+      role: UserRole.CUSTOMER,
     };
 
     const user = await createUser(userData);
@@ -29,7 +30,7 @@ describe("User Service - Create User", () => {
     const userData: CreateUserDto = {
       email: "admin@example.com",
       password: "AdminPass123!",
-      role: "admin",
+      role: UserRole.ADMIN,
     };
 
     const user = await createUser(userData);
@@ -44,7 +45,7 @@ describe("User Service - Create User", () => {
     const userData: CreateUserDto = {
       email: "duplicate@example.com",
       password: "TestPass123!",
-      role: "customer",
+      role: UserRole.CUSTOMER,
     };
 
     await createUser(userData);
@@ -61,7 +62,7 @@ describe("User Service - Create User", () => {
     const userData: CreateUserDto = {
       email: "hash@example.com",
       password: "TestPass123!",
-      role: "customer",
+      role: UserRole.CUSTOMER,
     };
 
     await createUser(userData);
@@ -75,7 +76,7 @@ describe("User Service - Create User", () => {
     const userData: CreateUserDto = {
       email: "uuid@example.com",
       password: "TestPass123!",
-      role: "customer",
+      role: UserRole.CUSTOMER,
     };
 
     const user = await createUser(userData);

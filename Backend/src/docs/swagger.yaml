@@ -72,6 +72,81 @@ components:
           type: string
           example: "USA"
 
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+        stock:
+          type: integer
+        categoryId:
+          type: string
+          format: uuid
+        imageUrl:
+          type: string
+          format: uri
+        cloudinaryPublicId:
+          type: string
+        isActive:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        category:
+          $ref: "#/components/schemas/Category"
+        productImages:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProductImage"
+
+    ProductImage:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        productId:
+          type: string
+          format: uuid
+        imageUrl:
+          type: string
+          format: uri
+        publicId:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
 paths:
   /health:
     get:

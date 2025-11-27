@@ -1,0 +1,7 @@
+-- Seed products
+INSERT INTO products (id, name, description, price, stock, category_id, image_url, cloudinary_public_id, is_active, created_at, updated_at) VALUES
+('671de000-42ba-41aa-9c5b-696136e77afd', 'iPhone 15 Pro', 'Latest Apple smartphone with advanced features', 999.99, 50, '1d097097-daab-4502-a166-e0da36bb3667', 'https://res.cloudinary.com/dnva8natm/image/upload/v1764257736/products/iphone15pro.jpg', 'products/iphone15pro', true, NOW(), NOW()),
+('782ef111-53cb-52bb-a06c-7a7247f88b0e', 'Samsung Galaxy S24', 'Premium Android smartphone', 849.99, 30, '1d097097-daab-4502-a166-e0da36bb3667', 'https://res.cloudinary.com/dnva8natm/image/upload/v1764257736/products/galaxys24.jpg', 'products/galaxys24', true, NOW(), NOW()),
+('893f0222-64dc-63cc-b17d-8b8358099c1f', 'Nike Air Max', 'Comfortable running shoes', 129.99, 75, '2e208208-ebbc-5613-b277-f1eb47cc4778', 'https://res.cloudinary.com/dnva8natm/image/upload/v1764257736/products/nikeairmax.jpg', 'products/nikeairmax', true, NOW(), NOW()),
+('9a401333-75ed-74dd-c28e-9c9469100d20', 'JavaScript: The Good Parts', 'Essential JavaScript programming book', 29.99, 100, '3f319319-fccf-6724-c388-02fc58dd5889', 'https://res.cloudinary.com/dnva8natm/image/upload/v1764257736/products/jsbook.jpg', 'products/jsbook', true, NOW(), NOW())
+ON CONFLICT (id) DO NOTHING;
