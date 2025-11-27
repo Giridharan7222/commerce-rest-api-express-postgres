@@ -1,7 +1,9 @@
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
-import { User } from "../models";
+import { User, CustomerProfile, AdminProfile, Address } from "../models";
 import { LoginDto } from "../dtos/user";
+import { UserRole } from "../enums/user";
+import { JwtPayload, JwtProfilePayload, JwtAddressPayload } from "../interfaces/jwt";
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
@@ -23,12 +25,49 @@ export async function loginUser(dto: LoginDto) {
     throw new Error("Invalid email or password");
   }
 
+  // Fetch profile based on role
+  let profileData = null;
+  if (user.role === UserRole.CUSTOMER) {
+    const profile = await CustomerProfile.findOne({ where: { user_id: user.id } });
+    if (profile) {
+      profileData = {
+        full_name: profile.full_name || '',
+        phone: profile.phone || '',
+      };
+    }
+  } else if (user.role === UserRole.ADMIN) {
+    const profile = await AdminProfile.findOne({ where: { user_id: user.id } });
+    if (profile) {
+      profileData = {
+        full_name: profile.full_name,
+        phone: profile.phone,
+      };
+    }
+  }
+
+  // Fetch addresses
+  const addresses = await Address.findAll({ where: { user_id: user.id } });
+  const addressesData: JwtAddressPayload[] = addresses.map(addr => ({
+    phone: addr.phone,
+    address_line1: addr.address_line1,
+    address_line2: addr.address_line2,
+    city: addr.city,
+    state: addr.state,
+    pincode: addr.pincode,
+    country: addr.country,
+    is_default: addr.is_default,
+  }));
+
+  const tokenPayload: JwtPayload = {
+    id: user.id,
+    email: user.email,
+    role: user.role as UserRole,
+    profile: profileData,
+    addresses: addressesData,
+  };
+
   const token = jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    },
+    tokenPayload,
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN } as SignOptions,
   );
@@ -48,12 +87,49 @@ export async function refreshToken(userId: string) {
     throw new Error("User not found or inactive");
   }
 
+  // Fetch profile based on role
+  let profileData = null;
+  if (user.role === UserRole.CUSTOMER) {
+    const profile = await CustomerProfile.findOne({ where: { user_id: user.id } });
+    if (profile) {
+      profileData = {
+        full_name: profile.full_name || '',
+        phone: profile.phone || '',
+      };
+    }
+  } else if (user.role === UserRole.ADMIN) {
+    const profile = await AdminProfile.findOne({ where: { user_id: user.id } });
+    if (profile) {
+      profileData = {
+        full_name: profile.full_name,
+        phone: profile.phone,
+      };
+    }
+  }
+
+  // Fetch addresses
+  const addresses = await Address.findAll({ where: { user_id: user.id } });
+  const addressesData: JwtAddressPayload[] = addresses.map(addr => ({
+    phone: addr.phone,
+    address_line1: addr.address_line1,
+    address_line2: addr.address_line2,
+    city: addr.city,
+    state: addr.state,
+    pincode: addr.pincode,
+    country: addr.country,
+    is_default: addr.is_default,
+  }));
+
+  const tokenPayload: JwtPayload = {
+    id: user.id,
+    email: user.email,
+    role: user.role as UserRole,
+    profile: profileData,
+    addresses: addressesData,
+  };
+
   const token = jwt.sign(
-    {
-      id: user.id,
-      email: user.email,
-      role: user.role,
-    },
+    tokenPayload,
     JWT_SECRET,
     { expiresIn: JWT_EXPIRES_IN } as SignOptions,
   );

@@ -1,12 +1,16 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import { User } from "../models";
+import { User, CustomerProfile, AdminProfile, Address } from "../models";
+
+import { UserRole } from "../enums/user";
 
 interface AuthRequest extends Request {
   user?: {
     id: string;
     email: string;
-    role: "admin" | "customer";
+    role: UserRole;
+    profile?: any;
+    addresses?: any[];
   };
 }
 
@@ -43,10 +47,23 @@ export const authenticateToken = async (
       );
     }
 
+    // Fetch profile based on role
+    let profile = null;
+    if (user.role === UserRole.CUSTOMER) {
+      profile = await CustomerProfile.findOne({ where: { user_id: user.id } });
+    } else if (user.role === UserRole.ADMIN) {
+      profile = await AdminProfile.findOne({ where: { user_id: user.id } });
+    }
+
+    // Fetch addresses
+    const addresses = await Address.findAll({ where: { user_id: user.id } });
+
     req.user = {
       id: user.id,
       email: user.email,
-      role: user.role,
+      role: user.role as UserRole,
+      profile: profile || null,
+      addresses: addresses || [],
     };
 
     next();
@@ -55,7 +72,7 @@ export const authenticateToken = async (
   }
 };
 
-export const requireRole = (roles: ("admin" | "customer")[]) => {
+export const requireRole = (roles: UserRole[]) => {
   return (req: AuthRequest, res: Response, next: NextFunction) => {
     if (!req.user) {
       return (res as any).fail(

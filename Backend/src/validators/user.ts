@@ -5,6 +5,7 @@ import {
   CreateCustomerProfileDto,
   CreateAddressDto,
 } from "../dtos/user";
+import { UserRole } from "../enums/user";
 
 export const createUserSchema: Schema = {
   email: {
@@ -154,14 +155,14 @@ export const createAdminSchema: Schema = {
 
 export const createUserPayload = (req: Request): CreateUserDto => {
   // Block role escalation attempts
-  if (req.body.role && req.body.role === "admin") {
+  if (req.body.role && req.body.role === UserRole.ADMIN) {
     throw new Error("You are not allowed to set admin role");
   }
 
   return {
     email: req.body.email,
     password: req.body.password,
-    role: "customer", // Force customer role
+    role: UserRole.CUSTOMER, // Force customer role
   };
 };
 
@@ -169,7 +170,7 @@ export const createAdminPayload = (req: Request): CreateUserDto => {
   return {
     email: req.body.email,
     password: req.body.password,
-    role: "admin",
+    role: UserRole.ADMIN,
   };
 };
 
@@ -206,7 +207,7 @@ export const updateUserSchema: Schema = {
     in: "body",
     optional: true,
     isIn: {
-      options: [["admin", "customer"]],
+      options: [[UserRole.ADMIN, UserRole.CUSTOMER]],
       errorMessage: "Role must be either admin or customer",
     },
   },

@@ -1,7 +1,9 @@
+import { UserRole } from "../enums/user";
+
 export interface UserResponseDto {
   id: string;
   email: string;
-  role: "admin" | "customer";
+  role: UserRole;
   is_active: boolean;
   created_at: Date;
   updated_at: Date;
@@ -10,13 +12,13 @@ export interface UserResponseDto {
 export interface CreateUserDto {
   email: string;
   password: string;
-  role: "admin" | "customer";
+  role: UserRole;
 }
 
 export interface UpdateUserDto {
   email?: string;
   password?: string;
-  role?: "admin" | "customer";
+  role?: UserRole;
   is_active?: boolean;
 }
 
