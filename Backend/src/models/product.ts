@@ -16,7 +16,6 @@ import {
 import Category from "./category";
 import ProductImage from "./productImage";
 
-
 @Table({
   tableName: "products",
   modelName: "Product",

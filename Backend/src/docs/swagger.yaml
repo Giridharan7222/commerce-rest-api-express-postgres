@@ -8,12 +8,43 @@ servers:
   - url: http://localhost:5005
     description: Development server
 
+tags:
+  - name: Health
+    description: Health check endpoints
+  - name: Authentication
+    description: User authentication
+  - name: Users
+    description: User management
+  - name: Categories
+    description: Product categories
+  - name: Products
+    description: Product management
+  - name: Product Images
+    description: Product image management
+  - name: Cart
+    description: Shopping cart operations
+  - name: Orders
+    description: Order management
+  - name: Stripe
+    description: Stripe payment integration
+  - name: Payment Methods
+    description: Saved payment methods
+
 components:
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+      description: |
+        JWT token provides access to authenticated user data:
+        - user.id: User UUID
+        - user.email: User email address
+        - user.role: User role (customer/admin)
+        - user.profile: User profile data (CustomerProfile/AdminProfile)
+        - user.addresses: Array of user addresses
+
+        These fields are automatically available in controllers and should NOT be included in request bodies.
 
   schemas:
     User:
@@ -147,6 +178,259 @@ components:
           type: string
           format: date-time
 
+    CartItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        product_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+        price_at_time:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        product:
+          $ref: "#/components/schemas/Product"
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        total_amount:
+          type: number
+        status:
+          type: string
+          enum: [pending, confirmed, shipped, delivered, cancelled]
+        payment_status:
+          type: string
+          enum: [pending, paid, failed, refunded]
+        shipping_address:
+          type: object
+        payment_method:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OrderItem"
+        invoice:
+          $ref: "#/components/schemas/Invoice"
+
+    OrderItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        order_id:
+          type: string
+          format: uuid
+        product_id:
+          type: string
+          format: uuid
+        quantity:
+          type: integer
+          minimum: 1
+        price_at_order_time:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        product:
+          $ref: "#/components/schemas/Product"
+
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_number:
+          type: string
+        order_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        sub_total:
+          type: number
+        tax_amount:
+          type: number
+        discount_amount:
+          type: number
+        total_amount:
+          type: number
+        currency:
+          type: string
+          default: "INR"
+        status:
+          type: string
+          enum: [generated, paid, cancelled]
+        stripe_invoice_id:
+          type: string
+        issued_at:
+          type: string
+          format: date-time
+        paid_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        lineItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvoiceLineItem"
+
+    InvoiceLineItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+        product_id:
+          type: string
+          format: uuid
+        product_name:
+          type: string
+        quantity:
+          type: integer
+          minimum: 1
+        price:
+          type: number
+        total_price:
+          type: number
+        tax_rate:
+          type: number
+        tax_amount:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PaymentMethod:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        stripe_payment_method_id:
+          type: string
+        stripe_customer_id:
+          type: string
+        type:
+          type: string
+        brand:
+          type: string
+          enum:
+            [visa, mastercard, amex, discover, diners, jcb, unionpay, unknown]
+        last4:
+          type: string
+        expiry_month:
+          type: integer
+        expiry_year:
+          type: integer
+        is_default:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
+    PaymentTransaction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        order_id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        transaction_reference:
+          type: string
+        payment_method:
+          type: string
+          enum: [credit_card, debit_card, upi, net_banking, wallet]
+        amount:
+          type: number
+        currency:
+          type: string
+          default: "INR"
+        status:
+          type: string
+          enum: [initiated, processing, completed, failed, cancelled, refunded]
+        gateway_response:
+          type: object
+        payment_intent_id:
+          type: string
+        charge_id:
+          type: string
+        stripe_customer_id:
+          type: string
+        stripe_payment_method_id:
+          type: string
+        initiated_at:
+          type: string
+          format: date-time
+        processed_at:
+          type: string
+          format: date-time
+        paid_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+
 paths:
   /health:
     get:
@@ -189,6 +473,88 @@ paths:
         "201":
           description: User created successfully
 
+  # Stripe endpoints
+  /api/stripe/customers:
+    post:
+      summary: Get or create Stripe customer
+      tags: [Stripe]
+      security:
+        - bearerAuth: []
+      description: |
+        🔐 **Authentication Required**: This endpoint uses JWT token authentication only.
+
+        **No Request Body Required** - All customer information is automatically extracted from the authenticated user's JWT token:
+        - Customer name: Derived from user profile (firstName + lastName or full_name)
+        - Customer email: Extracted from JWT token user.email
+        - User ID: Extracted from JWT token user.id
+
+        Simply send a POST request with only the Authorization header containing your JWT token.
+      parameters: []
+      responses:
+        "200":
+          description: Stripe customer retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Stripe customer retrieved successfully"
+                  data:
+                    type: object
+                    properties:
+                      customerId:
+                        type: string
+                        example: "cus_stripe_customer_id"
+                      name:
+                        type: string
+                        example: "John Doe"
+                      email:
+                        type: string
+                        example: "john.doe@example.com"
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthorized"
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "UNAUTHORIZED"
+        "400":
+          description: Bad Request - Error creating Stripe customer
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Error message"
+                  error:
+                    type: object
+                    properties:
+                      code:
+                        type: string
+                        example: "STRIPE_ERROR"
+
   /api/users:
     get:
       summary: Get all users (Admin only)
@@ -214,3 +580,353 @@ paths:
       responses:
         "200":
           description: User details
+
+  # Cart endpoints
+  /api/cart:
+    get:
+      summary: Get user's cart
+      tags: [Cart]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Cart retrieved successfully
+    post:
+      summary: Add product to cart
+      tags: [Cart]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [productId, quantity]
+              properties:
+                productId:
+                  type: string
+                  format: uuid
+                  description: Product to add to cart
+                quantity:
+                  type: integer
+                  minimum: 1
+                  description: Quantity to add
+              # Note: user_id is extracted from JWT token
+      responses:
+        "201":
+          description: Product added to cart successfully
+    delete:
+      summary: Clear cart
+      tags: [Cart]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Cart cleared successfully
+
+  /api/cart/{productId}:
+    put:
+      summary: Update cart item quantity
+      tags: [Cart]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [quantity]
+              properties:
+                quantity:
+                  type: integer
+                  minimum: 1
+                  description: New quantity for the cart item
+              # Note: user_id is extracted from JWT token
+      responses:
+        "200":
+          description: Cart item updated successfully
+    delete:
+      summary: Remove product from cart
+      tags: [Cart]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Product removed from cart successfully
+
+  # Order endpoints
+  /api/orders:
+    get:
+      summary: Get order history
+      tags: [Orders]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 10
+      responses:
+        "200":
+          description: Order history retrieved successfully
+    post:
+      summary: Create order from cart
+      tags: [Orders]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [shippingAddress]
+              properties:
+                shippingAddress:
+                  type: object
+                  required:
+                    [
+                      full_name,
+                      phone,
+                      address_line1,
+                      city,
+                      state,
+                      pincode,
+                      country,
+                    ]
+                  properties:
+                    full_name:
+                      type: string
+                      description: Full name for delivery
+                    phone:
+                      type: string
+                      description: Phone number for delivery
+                    address_line1:
+                      type: string
+                      description: Primary address line
+                    address_line2:
+                      type: string
+                      description: Secondary address line (optional)
+                    city:
+                      type: string
+                      description: City name
+                    state:
+                      type: string
+                      description: State or province
+                    pincode:
+                      type: string
+                      description: Postal/ZIP code
+                    country:
+                      type: string
+                      description: Country name
+                paymentMethod:
+                  type: string
+                  description: Payment method identifier (optional)
+              # Note: user_id, email, profile, and addresses are extracted from JWT token
+      responses:
+        "201":
+          description: Order created successfully
+
+  /api/orders/{orderId}:
+    get:
+      summary: Get order by ID
+      tags: [Orders]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Order details retrieved successfully
+    delete:
+      summary: Cancel order
+      tags: [Orders]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Order cancelled successfully
+
+  # Stripe endpoints
+  /api/stripe/setup-intents:
+    post:
+      summary: Create setup intent for saving payment methods
+      tags: [Stripe]
+      security:
+        - bearerAuth: []
+      description: |
+        Creates a Stripe setup intent for the authenticated user.
+        Customer ID is automatically derived from JWT token.
+      responses:
+        "200":
+          description: Setup intent created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  data:
+                    type: object
+                    properties:
+                      client_secret:
+                        type: string
+                      customer_id:
+                        type: string
+
+  /api/stripe/payment-intents:
+    post:
+      summary: Create payment intent
+      tags: [Stripe]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [amount]
+              properties:
+                amount:
+                  type: number
+                  description: Amount in smallest currency unit (e.g., paise for INR)
+                currency:
+                  type: string
+                  default: "inr"
+                  description: Currency code
+                paymentMethodId:
+                  type: string
+                  description: Stripe payment method ID (optional)
+              # Note: customer_id is derived from JWT user.id via Stripe customer mapping
+      responses:
+        "200":
+          description: Payment intent created successfully
+
+  /api/stripe/process-payment:
+    post:
+      summary: Confirm payment intent
+      tags: [Stripe]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [paymentIntentId, paymentMethodId]
+              properties:
+                paymentIntentId:
+                  type: string
+                  description: Stripe payment intent ID
+                paymentMethodId:
+                  type: string
+                  description: Stripe payment method ID
+              # Note: user authentication is verified via JWT token
+      responses:
+        "200":
+          description: Payment confirmed successfully
+
+  /api/stripe/webhook:
+    post:
+      summary: Stripe webhook endpoint
+      tags: [Stripe]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Webhook processed successfully
+
+  # Payment Methods endpoints
+  /api/payment-methods:
+    get:
+      summary: Get saved payment methods
+      tags: [Payment Methods]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Payment methods retrieved successfully
+    post:
+      summary: Save payment method
+      tags: [Payment Methods]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [stripePaymentMethodId]
+              properties:
+                stripePaymentMethodId:
+                  type: string
+                  description: Stripe payment method ID
+                isDefault:
+                  type: boolean
+                  default: false
+                  description: Set as default payment method
+              # Note: user_id and stripeCustomerId are derived from JWT token
+      responses:
+        "201":
+          description: Payment method saved successfully
+
+  /api/payment-methods/{paymentMethodId}:
+    delete:
+      summary: Delete payment method
+      tags: [Payment Methods]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: paymentMethodId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Payment method deleted successfully

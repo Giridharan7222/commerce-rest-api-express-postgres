@@ -1,79 +1,154 @@
 import { Request, Response } from "express";
+import { validationResult } from "express-validator";
 import StripeService from "../services/stripe";
+import { PaymentService } from "../services/payment";
+import { StripeCustomerService } from "../services/stripeCustomer";
 import { CreateCustomerData, CreatePaymentIntentData } from "../types/stripe";
+import {
+  createCustomerPayload,
+  createSetupIntentPayload,
+} from "../validators/stripe";
+import {
+  processPaymentPayload,
+  createPaymentIntentPayload,
+} from "../validators/payment";
+import { UserRole } from "../enums/user";
+
+interface AuthRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+    role: UserRole;
+    profile?: any;
+    addresses?: any[];
+  };
+}
 
 export class StripeController {
   // Create customer
-  async createCustomer(req: Request, res: Response) {
+  async createCustomer(req: AuthRequest, res: Response) {
     try {
-      const { name, email }: CreateCustomerData = req.body;
-      const customer = await StripeService.createCustomer(name, email);
+      const userId = req.user?.id;
+      const userEmail = req.user?.email;
+      const userProfile = req.user?.profile;
 
-      res.json({
-        success: true,
-        data: {
+      if (!userId || !userEmail) {
+        return (res as any).fail("Unauthorized", "UNAUTHORIZED", null, 401);
+      }
+
+      // Get or create Stripe customer using JWT data
+      const stripeCustomerId =
+        await StripeCustomerService.getOrCreateStripeCustomer(
+          userId,
+          undefined,
+          userEmail,
+          userProfile,
+        );
+
+      const customer = await StripeService.retrieveCustomer(stripeCustomerId);
+
+      return (res as any).success(
+        "Stripe customer retrieved successfully",
+        {
           customerId: customer.id,
           name: customer.name,
           email: customer.email,
         },
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+        200,
+      );
+    } catch (error: any) {
+      return (res as any).fail(error.message, "STRIPE_ERROR", null, 400);
     }
   }
 
   // Create setup intent for saving cards
-  async createSetupIntent(req: Request, res: Response) {
+  async createSetupIntent(req: AuthRequest, res: Response) {
     try {
-      const { customerId } = req.body;
-      const setupIntent = await StripeService.createSetupIntent(customerId);
+      const userId = req.user?.id;
+      const userEmail = req.user?.email;
+      const userProfile = req.user?.profile;
 
-      res.json({
-        success: true,
-        data: {
+      if (!userId) {
+        return (res as any).fail("Unauthorized", "UNAUTHORIZED", null, 401);
+      }
+
+      // Get or create Stripe customer using JWT data
+      const stripeCustomerId =
+        await StripeCustomerService.getOrCreateStripeCustomer(
+          userId,
+          undefined,
+          userEmail,
+          userProfile,
+        );
+
+      const setupIntent =
+        await StripeService.createSetupIntent(stripeCustomerId);
+
+      return (res as any).success(
+        "Setup intent created successfully",
+        {
           client_secret: setupIntent.client_secret,
+          customer_id: stripeCustomerId,
         },
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+        200,
+      );
+    } catch (error: any) {
+      return (res as any).fail(error.message, "STRIPE_ERROR", null, 400);
     }
   }
 
   // Create payment intent
-  async createPaymentIntent(req: Request, res: Response) {
+  async createPaymentIntent(req: AuthRequest, res: Response) {
     try {
-      const {
-        amount,
-        currency,
-        customerId,
-        paymentMethodId,
-      }: CreatePaymentIntentData = req.body;
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return (res as any).fail(
+          "Validation failed",
+          "VALIDATION_ERROR",
+          errors.array(),
+          400,
+        );
+      }
+
+      const userId = req.user?.id;
+      const userEmail = req.user?.email;
+      const userProfile = req.user?.profile;
+
+      if (!userId) {
+        return (res as any).fail("Unauthorized", "UNAUTHORIZED", null, 401);
+      }
+
+      const { amount, currency, paymentMethodId } =
+        createPaymentIntentPayload(req);
+
+      // Get or create Stripe customer using JWT data
+      const stripeCustomerId =
+        await StripeCustomerService.getOrCreateStripeCustomer(
+          userId,
+          undefined,
+          userEmail,
+          userProfile,
+        );
+
       const paymentIntent = await StripeService.createPaymentIntent(
         amount,
         currency,
-        customerId,
+        stripeCustomerId,
         paymentMethodId,
       );
 
-      res.json({
-        success: true,
-        data: {
+      return (res as any).success(
+        "Payment intent created successfully",
+        {
           id: paymentIntent.id,
           client_secret: paymentIntent.client_secret,
           status: paymentIntent.status,
+          customer_id: stripeCustomerId,
         },
-      });
-    } catch (error) {
-      res.status(400).json({
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      });
+        200,
+      );
+    } catch (error: any) {
+      return (res as any).fail(error.message, "STRIPE_ERROR", null, 400);
     }
   }
 
@@ -101,26 +176,47 @@ export class StripeController {
     }
   }
 
+  // Process payment
+  async processPayment(req: AuthRequest, res: Response) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return (res as any).fail(
+          "Validation failed",
+          "VALIDATION_ERROR",
+          errors.array(),
+          400,
+        );
+      }
+
+      const userId = req.user?.id;
+      if (!userId) {
+        return (res as any).fail("Unauthorized", "UNAUTHORIZED", null, 401);
+      }
+
+      const { paymentIntentId, paymentMethodId } = processPaymentPayload(req);
+      const result = await PaymentService.processPayment(
+        paymentIntentId,
+        paymentMethodId,
+      );
+
+      return (res as any).success(
+        "Payment processed successfully",
+        result.paymentIntent,
+        200,
+      );
+    } catch (error: any) {
+      return (res as any).fail(error.message, "PAYMENT_ERROR", null, 400);
+    }
+  }
+
   // Handle webhooks
   async handleWebhook(req: Request, res: Response) {
     try {
       const signature = req.headers["stripe-signature"] as string;
       const event = StripeService.constructEvent(req.body, signature);
 
-      // Handle different event types
-      switch (event.type) {
-        case "payment_intent.succeeded":
-          // Update payment status in database
-          console.log("Payment succeeded:", event.data.object);
-          break;
-        case "payment_intent.payment_failed":
-          // Handle failed payment
-          console.log("Payment failed:", event.data.object);
-          break;
-        default:
-          console.log(`Unhandled event type: ${event.type}`);
-      }
-
+      await PaymentService.handleWebhookEvent(event);
       res.json({ received: true });
     } catch (error) {
       res.status(400).json({

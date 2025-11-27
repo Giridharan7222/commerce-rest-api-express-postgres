@@ -10,14 +10,16 @@ import {
   UpdatedAt,
   ForeignKey,
   BelongsTo,
+  Unique,
 } from "sequelize-typescript";
+import User from "./users";
 import Product from "./product";
 
 @Table({
-  tableName: "product_images",
-  modelName: "ProductImage",
+  tableName: "cart_items",
+  modelName: "CartItem",
 })
-export default class ProductImage extends Model {
+export default class CartItem extends Model {
   @PrimaryKey
   @Column({
     type: DataType.UUID,
@@ -25,26 +27,37 @@ export default class ProductImage extends Model {
   })
   id!: string;
 
+  @ForeignKey(() => User)
+  @AllowNull(false)
+  @Column({
+    type: DataType.UUID,
+    field: "user_id",
+  })
+  user_id!: string;
+
   @ForeignKey(() => Product)
   @AllowNull(false)
   @Column({
     type: DataType.UUID,
     field: "product_id",
   })
-  productId!: string;
+  product_id!: string;
 
   @AllowNull(false)
   @Column({
-    type: DataType.STRING,
-    field: "image_url",
+    type: DataType.INTEGER,
+    validate: {
+      min: 1,
+    },
   })
-  imageUrl!: string;
+  quantity!: number;
 
+  @AllowNull(false)
   @Column({
-    type: DataType.STRING,
-    field: "public_id",
+    type: DataType.DECIMAL(10, 2),
+    field: "price_at_time",
   })
-  publicId?: string;
+  price_at_time!: number;
 
   @CreatedAt
   @Column({ field: "created_at", type: DataType.DATE })
@@ -53,6 +66,9 @@ export default class ProductImage extends Model {
   @UpdatedAt
   @Column({ field: "updated_at", type: DataType.DATE })
   updated_at!: Date;
+
+  @BelongsTo(() => User)
+  user!: User;
 
   @BelongsTo(() => Product)
   product!: Product;

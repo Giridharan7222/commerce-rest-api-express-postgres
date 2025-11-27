@@ -13,7 +13,9 @@ import { uploadFile } from "../utils/cloudinary";
 
 export async function createCategory(dto: CreateCategoryDto) {
   // Check for duplicate category name
-  const existingCategory = await Category.findOne({ where: { name: dto.name } });
+  const existingCategory = await Category.findOne({
+    where: { name: dto.name },
+  });
   if (existingCategory) {
     throw new Error(`Category with name '${dto.name}' already exists`);
   }
@@ -41,7 +43,10 @@ export async function getCategoryById(categoryId: string) {
   return category.get({ plain: true });
 }
 
-export async function updateCategory(categoryId: string, dto: UpdateCategoryDto) {
+export async function updateCategory(
+  categoryId: string,
+  dto: UpdateCategoryDto,
+) {
   const category = await Category.findByPk(categoryId);
 
   if (!category) {
@@ -81,12 +86,12 @@ export async function createProduct(dto: CreateProductDto) {
   const product = await Product.create(productData as any);
 
   if (productImages && productImages.length > 0) {
-    const imagePromises = productImages.map(image => 
+    const imagePromises = productImages.map((image) =>
       ProductImage.create({
         productId: product.id,
         imageUrl: image.imageUrl,
         publicId: image.publicId,
-      } as any)
+      } as any),
     );
     await Promise.all(imagePromises);
   }
@@ -97,7 +102,7 @@ export async function createProduct(dto: CreateProductDto) {
 export async function createProductWithFiles(
   productData: any,
   mainImage?: any,
-  additionalImages?: any[]
+  additionalImages?: any[],
 ) {
   const category = await Category.findByPk(productData.categoryId);
   if (!category) {
@@ -211,7 +216,10 @@ export async function getProductImages(productId: string) {
   return images.map((image: any) => image.get({ plain: true }));
 }
 
-export async function updateProductImage(imageId: string, dto: UpdateProductImageDto) {
+export async function updateProductImage(
+  imageId: string,
+  dto: UpdateProductImageDto,
+) {
   const image = await ProductImage.findByPk(imageId);
 
   if (!image) {

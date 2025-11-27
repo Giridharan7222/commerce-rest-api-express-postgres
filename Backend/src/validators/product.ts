@@ -15,13 +15,19 @@ export const createProductValidation = [
   body("name").notEmpty().withMessage("Name is required"),
   body("description").optional().isString(),
   body("price").isNumeric().withMessage("Price must be a number"),
-  body("stock").optional().isInt({ min: 0 }).withMessage("Stock must be a non-negative integer"),
+  body("stock")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Stock must be a non-negative integer"),
   body("categoryId").isUUID().withMessage("Valid category ID is required"),
   body("imageUrl").optional().isURL().withMessage("Image URL must be valid"),
   body("cloudinaryPublicId").optional().isString(),
   body("isActive").optional().isBoolean(),
   body("productImages").optional().isArray(),
-  body("productImages.*.imageUrl").optional().isURL().withMessage("Product image URL must be valid"),
+  body("productImages.*.imageUrl")
+    .optional()
+    .isURL()
+    .withMessage("Product image URL must be valid"),
   body("productImages.*.publicId").optional().isString(),
 ];
 
@@ -29,8 +35,14 @@ export const updateProductValidation = [
   body("name").optional().notEmpty().withMessage("Name cannot be empty"),
   body("description").optional().isString(),
   body("price").optional().isNumeric().withMessage("Price must be a number"),
-  body("stock").optional().isInt({ min: 0 }).withMessage("Stock must be a non-negative integer"),
-  body("categoryId").optional().isUUID().withMessage("Category ID must be valid"),
+  body("stock")
+    .optional()
+    .isInt({ min: 0 })
+    .withMessage("Stock must be a non-negative integer"),
+  body("categoryId")
+    .optional()
+    .isUUID()
+    .withMessage("Category ID must be valid"),
   body("imageUrl").optional().isURL().withMessage("Image URL must be valid"),
   body("cloudinaryPublicId").optional().isString(),
   body("isActive").optional().isBoolean(),

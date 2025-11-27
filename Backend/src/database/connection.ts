@@ -6,6 +6,15 @@ import Address from "../models/address";
 import Category from "../models/category";
 import Product from "../models/product";
 import ProductImage from "../models/productImage";
+import CartItem from "../models/cartItem";
+import Order from "../models/order";
+import OrderItem from "../models/orderItem";
+import Invoice from "../models/invoice";
+import InvoiceLineItem from "../models/invoiceLineItem";
+import PaymentTransaction from "../models/paymentTransaction";
+import PaymentMethod from "../models/paymentMethod";
+import StripeCustomer from "../models/stripeCustomer";
+import Refund from "../models/refund";
 
 const sequelize = new Sequelize({
   host: process.env.POSTGRES_HOST_NONCONTAINER,
@@ -14,7 +23,24 @@ const sequelize = new Sequelize({
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
   dialect: "postgres",
-  models: [User, CustomerProfile, AdminProfile, Address, Category, Product, ProductImage],
+  models: [
+    User,
+    CustomerProfile,
+    AdminProfile,
+    Address,
+    Category,
+    Product,
+    ProductImage,
+    CartItem,
+    Order,
+    OrderItem,
+    Invoice,
+    InvoiceLineItem,
+    PaymentTransaction,
+    PaymentMethod,
+    StripeCustomer,
+    Refund,
+  ],
   logging: false,
 });
 

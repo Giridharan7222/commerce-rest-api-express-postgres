@@ -1,0 +1,148 @@
+paths:
+  /api/payment-methods:
+    post:
+      summary: Save payment method
+      tags: [Payment Methods]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - stripePaymentMethodId
+                - stripeCustomerId
+              properties:
+                stripePaymentMethodId:
+                  type: string
+                  example: "pm_stripe_payment_method_id"
+                stripeCustomerId:
+                  type: string
+                  example: "cus_stripe_customer_id"
+                isDefault:
+                  type: boolean
+                  default: false
+                  example: true
+      responses:
+        "201":
+          description: Payment method saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Payment method saved successfully"
+                  data:
+                    $ref: "#/components/schemas/PaymentMethod"
+        "400":
+          description: Validation error
+        "401":
+          description: Unauthorized
+
+    get:
+      summary: Get user's saved payment methods
+      tags: [Payment Methods]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Payment methods retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Payment methods retrieved successfully"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PaymentMethod"
+        "401":
+          description: Unauthorized
+
+  /api/payment-methods/{paymentMethodId}:
+    delete:
+      summary: Delete saved payment method
+      tags: [Payment Methods]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: paymentMethodId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Payment method deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Payment method deleted successfully"
+                  data:
+                    type: null
+        "404":
+          description: Payment method not found
+        "401":
+          description: Unauthorized
+
+components:
+  schemas:
+    PaymentMethod:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        stripe_payment_method_id:
+          type: string
+        stripe_customer_id:
+          type: string
+        type:
+          type: string
+          example: "card"
+        brand:
+          type: string
+          enum: [visa, mastercard, amex, discover, phonepe, gpay, paytm, other]
+          example: "visa"
+        last4:
+          type: string
+          example: "4242"
+        expiry_month:
+          type: integer
+          example: 12
+        expiry_year:
+          type: integer
+          example: 2025
+        is_default:
+          type: boolean
+          example: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time

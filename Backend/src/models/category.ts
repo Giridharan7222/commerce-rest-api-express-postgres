@@ -12,7 +12,6 @@ import {
 } from "sequelize-typescript";
 import Product from "./product";
 
-
 @Table({
   tableName: "categories",
   modelName: "Category",

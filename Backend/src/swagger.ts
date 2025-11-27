@@ -102,6 +102,10 @@ const options = {
     "./src/docs/swagger/profile.swagger.yaml",
     "./src/docs/swagger/address.swagger.yaml",
     "./src/docs/swagger/product.swagger.yaml",
+    "./src/docs/swagger/cart.swagger.yaml",
+    "./src/docs/swagger/order.swagger.yaml",
+    "./src/docs/swagger/stripe.swagger.yaml",
+    "./src/docs/swagger/payment-methods.swagger.yaml",
     "./src/app.ts",
   ],
 };

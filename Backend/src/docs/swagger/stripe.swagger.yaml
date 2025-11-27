@@ -1,0 +1,263 @@
+paths:
+  /api/stripe/customers:
+    post:
+      summary: Create Stripe customer
+      tags: [Stripe]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+                - email
+              properties:
+                name:
+                  type: string
+                  example: "John Doe"
+                email:
+                  type: string
+                  format: email
+                  example: "john.doe@example.com"
+      responses:
+        "200":
+          description: Customer created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      customerId:
+                        type: string
+                        example: "cus_stripe_customer_id"
+                      name:
+                        type: string
+                        example: "John Doe"
+                      email:
+                        type: string
+                        example: "john.doe@example.com"
+        "400":
+          description: Validation error
+        "401":
+          description: Unauthorized
+
+  /api/stripe/setup-intents:
+    post:
+      summary: Create setup intent for saving cards
+      tags: [Stripe]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - customerId
+              properties:
+                customerId:
+                  type: string
+                  example: "cus_stripe_customer_id"
+      responses:
+        "200":
+          description: Setup intent created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      client_secret:
+                        type: string
+                        example: "seti_xxx_secret_xxx"
+        "400":
+          description: Validation error
+        "401":
+          description: Unauthorized
+
+  /api/stripe/payment-intents:
+    post:
+      summary: Create payment intent
+      tags: [Stripe]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+              properties:
+                amount:
+                  type: number
+                  example: 9999
+                  description: "Amount in smallest currency unit (cents for USD, paise for INR)"
+                currency:
+                  type: string
+                  example: "inr"
+                  default: "inr"
+                customerId:
+                  type: string
+                  example: "cus_stripe_customer_id"
+      responses:
+        "200":
+          description: Payment intent created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        example: "pi_stripe_payment_intent_id"
+                      client_secret:
+                        type: string
+                        example: "pi_xxx_secret_xxx"
+                      status:
+                        type: string
+                        example: "requires_payment_method"
+        "400":
+          description: Validation error
+        "401":
+          description: Unauthorized
+
+  /api/stripe/process-payment:
+    post:
+      summary: Process payment
+      tags: [Stripe]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - paymentIntentId
+                - paymentMethodId
+              properties:
+                paymentIntentId:
+                  type: string
+                  example: "pi_stripe_payment_intent_id"
+                paymentMethodId:
+                  type: string
+                  example: "pm_stripe_payment_method_id"
+      responses:
+        "200":
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      status:
+                        type: string
+                        example: "succeeded"
+        "400":
+          description: Payment failed or validation error
+        "401":
+          description: Unauthorized
+
+  /api/stripe/customers/{customerId}/cards:
+    get:
+      summary: Get customer's saved cards
+      tags: [Stripe]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: customerId
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Cards retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        brand:
+                          type: string
+                          example: "visa"
+                        last4:
+                          type: string
+                          example: "4242"
+                        exp_month:
+                          type: integer
+                          example: 12
+                        exp_year:
+                          type: integer
+                          example: 2025
+        "400":
+          description: Error retrieving cards
+        "401":
+          description: Unauthorized
+
+  /api/stripe/webhooks:
+    post:
+      summary: Stripe webhook endpoint
+      tags: [Stripe]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: "Stripe webhook event payload"
+      responses:
+        "200":
+          description: Webhook processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  received:
+                    type: boolean
+                    example: true
+        "400":
+          description: Webhook processing failed

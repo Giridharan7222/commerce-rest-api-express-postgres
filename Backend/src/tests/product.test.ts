@@ -4,7 +4,11 @@ import { User } from "../models";
 import Category from "../models/category";
 import Product from "../models/product";
 import ProductImage from "../models/productImage";
-import { createCategory, createProduct, createProductImage } from "../services/product";
+import {
+  createCategory,
+  createProduct,
+  createProductImage,
+} from "../services/product";
 import { createUser } from "../services/user";
 import { CreateUserDto } from "../dtos/user";
 import { UserRole } from "../enums/user";
@@ -16,7 +20,7 @@ describe("Product Service Tests", () => {
 
   beforeEach(async () => {
     await sequelize.sync({ force: true });
-    
+
     // Create admin user for tests
     const adminData: CreateUserDto = {
       email: "admin@test.com",
@@ -28,7 +32,7 @@ describe("Product Service Tests", () => {
     // Create test category
     testCategory = await createCategory({
       name: "Test Electronics",
-      description: "Test category for electronics"
+      description: "Test category for electronics",
     });
   });
 
@@ -36,7 +40,7 @@ describe("Product Service Tests", () => {
     it("1. should create a new category successfully", async () => {
       const categoryData = {
         name: "Books",
-        description: "Books and educational materials"
+        description: "Books and educational materials",
       };
 
       const category = await createCategory(categoryData);
@@ -49,7 +53,7 @@ describe("Product Service Tests", () => {
 
     it("2. should create category without description", async () => {
       const categoryData = {
-        name: "Clothing"
+        name: "Clothing",
       };
 
       const category = await createCategory(categoryData);
@@ -62,7 +66,7 @@ describe("Product Service Tests", () => {
     it("3. should NOT allow duplicate category names", async () => {
       const categoryData = {
         name: "Duplicate Category",
-        description: "First category"
+        description: "First category",
       };
 
       await createCategory(categoryData);
@@ -86,7 +90,7 @@ describe("Product Service Tests", () => {
         categoryId: testCategory.id,
         imageUrl: "https://example.com/iphone.jpg",
         cloudinaryPublicId: "products/iphone15pro",
-        isActive: true
+        isActive: true,
       };
 
       const product = await createProduct(productData);
@@ -103,7 +107,7 @@ describe("Product Service Tests", () => {
       const productData = {
         name: "Basic Product",
         price: 29.99,
-        categoryId: testCategory.id
+        categoryId: testCategory.id,
       };
 
       const product = await createProduct(productData);
@@ -118,7 +122,7 @@ describe("Product Service Tests", () => {
       const productData = {
         name: "Invalid Product",
         price: 99.99,
-        categoryId: "invalid-uuid"
+        categoryId: "invalid-uuid",
       };
 
       try {
@@ -132,8 +136,8 @@ describe("Product Service Tests", () => {
     it("7. should NOT create product with negative price", async () => {
       const productData = {
         name: "Negative Price Product",
-        price: -10.00,
-        categoryId: testCategory.id
+        price: -10.0,
+        categoryId: testCategory.id,
       };
 
       try {
@@ -147,9 +151,9 @@ describe("Product Service Tests", () => {
     it("8. should NOT create product with negative stock", async () => {
       const productData = {
         name: "Negative Stock Product",
-        price: 50.00,
+        price: 50.0,
         stock: -5,
-        categoryId: testCategory.id
+        categoryId: testCategory.id,
       };
 
       try {
@@ -168,7 +172,7 @@ describe("Product Service Tests", () => {
       testProduct = await createProduct({
         name: "Test Product",
         price: 99.99,
-        categoryId: testCategory.id
+        categoryId: testCategory.id,
       });
     });
 
@@ -176,21 +180,23 @@ describe("Product Service Tests", () => {
       const imageData = {
         productId: testProduct.id,
         imageUrl: "https://example.com/product-image.jpg",
-        publicId: "products/test-image"
+        publicId: "products/test-image",
       };
 
       const productImage = await createProductImage(imageData);
 
       expect(productImage).to.exist;
       expect(productImage.productId).to.equal(testProduct.id);
-      expect(productImage.imageUrl).to.equal("https://example.com/product-image.jpg");
+      expect(productImage.imageUrl).to.equal(
+        "https://example.com/product-image.jpg",
+      );
       expect(productImage.publicId).to.equal("products/test-image");
     });
 
     it("10. should create product image without publicId", async () => {
       const imageData = {
         productId: testProduct.id,
-        imageUrl: "https://example.com/product-image2.jpg"
+        imageUrl: "https://example.com/product-image2.jpg",
       };
 
       const productImage = await createProductImage(imageData);
@@ -202,7 +208,7 @@ describe("Product Service Tests", () => {
     it("11. should NOT create product image with invalid product ID", async () => {
       const imageData = {
         productId: "invalid-uuid",
-        imageUrl: "https://example.com/invalid.jpg"
+        imageUrl: "https://example.com/invalid.jpg",
       };
 
       try {
@@ -216,7 +222,7 @@ describe("Product Service Tests", () => {
     it("12. should NOT create product image with invalid URL", async () => {
       const imageData = {
         productId: testProduct.id,
-        imageUrl: "not-a-valid-url"
+        imageUrl: "not-a-valid-url",
       };
 
       try {
@@ -233,11 +239,11 @@ describe("Product Service Tests", () => {
       const product = await createProduct({
         name: "Relationship Test Product",
         price: 199.99,
-        categoryId: testCategory.id
+        categoryId: testCategory.id,
       });
 
       const productWithCategory = await Product.findByPk(product.id, {
-        include: [Category]
+        include: [Category],
       });
 
       expect(productWithCategory).to.exist;
@@ -249,21 +255,21 @@ describe("Product Service Tests", () => {
       const product = await createProduct({
         name: "Images Test Product",
         price: 299.99,
-        categoryId: testCategory.id
+        categoryId: testCategory.id,
       });
 
       await createProductImage({
         productId: product.id,
-        imageUrl: "https://example.com/image1.jpg"
+        imageUrl: "https://example.com/image1.jpg",
       });
 
       await createProductImage({
         productId: product.id,
-        imageUrl: "https://example.com/image2.jpg"
+        imageUrl: "https://example.com/image2.jpg",
       });
 
       const productWithImages = await Product.findByPk(product.id, {
-        include: [ProductImage]
+        include: [ProductImage],
       });
 
       expect(productWithImages).to.exist;
@@ -274,17 +280,17 @@ describe("Product Service Tests", () => {
       await createProduct({
         name: "Product 1",
         price: 99.99,
-        categoryId: testCategory.id
+        categoryId: testCategory.id,
       });
 
       await createProduct({
         name: "Product 2",
         price: 149.99,
-        categoryId: testCategory.id
+        categoryId: testCategory.id,
       });
 
       const categoryWithProducts = await Category.findByPk(testCategory.id, {
-        include: [Product]
+        include: [Product],
       });
 
       expect(categoryWithProducts).to.exist;
@@ -299,20 +305,20 @@ describe("Product Service Tests", () => {
         name: "Active Product",
         price: 99.99,
         categoryId: testCategory.id,
-        isActive: true
+        isActive: true,
       });
 
       await createProduct({
         name: "Inactive Product",
         price: 199.99,
         categoryId: testCategory.id,
-        isActive: false
+        isActive: false,
       });
     });
 
     it("16. should find only active products", async () => {
       const activeProducts = await Product.findAll({
-        where: { isActive: true }
+        where: { isActive: true },
       });
 
       expect(activeProducts).to.have.length(1);
@@ -321,7 +327,7 @@ describe("Product Service Tests", () => {
 
     it("17. should find products by category", async () => {
       const categoryProducts = await Product.findAll({
-        where: { categoryId: testCategory.id }
+        where: { categoryId: testCategory.id },
       });
 
       expect(categoryProducts).to.have.length(2);
@@ -331,9 +337,9 @@ describe("Product Service Tests", () => {
       const affordableProducts = await Product.findAll({
         where: {
           price: {
-            [Op.lte]: 150.00
-          }
-        }
+            [Op.lte]: 150.0,
+          },
+        },
       });
 
       expect(affordableProducts).to.have.length(1);

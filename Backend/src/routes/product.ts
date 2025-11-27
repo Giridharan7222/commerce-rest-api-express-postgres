@@ -30,30 +30,82 @@ import { UserRole } from "../enums/user";
 
 const router = Router();
 
-router.post("/categories", authenticateToken, requireRole([UserRole.ADMIN]), createCategoryValidation, createCategoryController);
+router.post(
+  "/categories",
+  authenticateToken,
+  requireRole([UserRole.ADMIN]),
+  createCategoryValidation,
+  createCategoryController,
+);
 router.get("/categories", getAllCategoriesController);
 router.get("/categories/:id", getCategoryController);
-router.put("/categories/:id", authenticateToken, requireRole([UserRole.ADMIN]), updateCategoryValidation, updateCategoryController);
-router.delete("/categories/:id", authenticateToken, requireRole([UserRole.ADMIN]), deleteCategoryController);
+router.put(
+  "/categories/:id",
+  authenticateToken,
+  requireRole([UserRole.ADMIN]),
+  updateCategoryValidation,
+  updateCategoryController,
+);
+router.delete(
+  "/categories/:id",
+  authenticateToken,
+  requireRole([UserRole.ADMIN]),
+  deleteCategoryController,
+);
 
-router.post("/products", authenticateToken, requireRole([UserRole.ADMIN]), createProductValidation, createProductController);
-router.post("/products/upload", //important api
+router.post(
+  "/products",
+  authenticateToken,
+  requireRole([UserRole.ADMIN]),
+  createProductValidation,
+  createProductController,
+);
+router.post(
+  "/products/upload", //important api
   authenticateToken,
   requireRole([UserRole.ADMIN]),
   upload.fields([
     { name: "mainImage", maxCount: 1 },
-    { name: "additionalImages", maxCount: 10 }
-  ]), 
-  createProductWithFilesController
+    { name: "additionalImages", maxCount: 10 },
+  ]),
+  createProductWithFilesController,
 );
 router.get("/products", getAllProductsController);
 router.get("/products/:id", getProductController);
-router.put("/products/:id", authenticateToken, requireRole([UserRole.ADMIN]), updateProductValidation, updateProductController);
-router.delete("/products/:id", authenticateToken, requireRole([UserRole.ADMIN]), deleteProductController);
+router.put(
+  "/products/:id",
+  authenticateToken,
+  requireRole([UserRole.ADMIN]),
+  updateProductValidation,
+  updateProductController,
+);
+router.delete(
+  "/products/:id",
+  authenticateToken,
+  requireRole([UserRole.ADMIN]),
+  deleteProductController,
+);
 
-router.post("/product-images", authenticateToken, requireRole([UserRole.ADMIN]), createProductImageValidation, createProductImageController);
+router.post(
+  "/product-images",
+  authenticateToken,
+  requireRole([UserRole.ADMIN]),
+  createProductImageValidation,
+  createProductImageController,
+);
 router.get("/products/:productId/images", getProductImagesController);
-router.put("/product-images/:id", authenticateToken, requireRole([UserRole.ADMIN]), updateProductImageValidation, updateProductImageController);
-router.delete("/product-images/:id", authenticateToken, requireRole([UserRole.ADMIN]), deleteProductImageController);
+router.put(
+  "/product-images/:id",
+  authenticateToken,
+  requireRole([UserRole.ADMIN]),
+  updateProductImageValidation,
+  updateProductImageController,
+);
+router.delete(
+  "/product-images/:id",
+  authenticateToken,
+  requireRole([UserRole.ADMIN]),
+  deleteProductImageController,
+);
 
 export default router;

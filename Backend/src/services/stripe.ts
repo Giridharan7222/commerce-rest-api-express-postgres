@@ -4,8 +4,12 @@ class StripeService {
   private stripe: Stripe;
 
   constructor() {
-    this.stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-      apiVersion: "2024-11-20.acacia",
+    const apiKey = process.env.STRIPE_SECRET_KEY;
+    if (!apiKey) {
+      throw new Error("STRIPE_SECRET_KEY environment variable is required");
+    }
+    this.stripe = new Stripe(apiKey, {
+      apiVersion: "2025-11-17.clover",
     });
   }
 

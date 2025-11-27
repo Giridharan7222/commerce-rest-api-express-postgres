@@ -31,11 +31,7 @@ export const createCategoryController = async (req: Request, res: Response) => {
 
   try {
     const category = await createCategory(req.body);
-    return (res as any).success(
-      "Category created successfully",
-      category,
-      201,
-    );
+    return (res as any).success("Category created successfully", category, 201);
   } catch (error) {
     return (res as any).fail(
       "Failed to create category",
@@ -46,10 +42,17 @@ export const createCategoryController = async (req: Request, res: Response) => {
   }
 };
 
-export const getAllCategoriesController = async (req: Request, res: Response) => {
+export const getAllCategoriesController = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const categories = await getAllCategories();
-    return (res as any).success("Categories retrieved successfully", categories, 200);
+    return (res as any).success(
+      "Categories retrieved successfully",
+      categories,
+      200,
+    );
   } catch (error) {
     return (res as any).fail(
       "Failed to get categories",
@@ -64,7 +67,11 @@ export const getCategoryController = async (req: Request, res: Response) => {
   try {
     const categoryId = req.params.id;
     const category = await getCategoryById(categoryId);
-    return (res as any).success("Category retrieved successfully", category, 200);
+    return (res as any).success(
+      "Category retrieved successfully",
+      category,
+      200,
+    );
   } catch (error) {
     return (res as any).fail(
       "Failed to get category",
@@ -128,11 +135,7 @@ export const createProductController = async (req: Request, res: Response) => {
 
   try {
     const product = await createProduct(req.body);
-    return (res as any).success(
-      "Product created successfully",
-      product,
-      201,
-    );
+    return (res as any).success("Product created successfully", product, 201);
   } catch (error) {
     return (res as any).fail(
       "Failed to create product",
@@ -143,7 +146,10 @@ export const createProductController = async (req: Request, res: Response) => {
   }
 };
 
-export const createProductWithFilesController = async (req: Request, res: Response) => {
+export const createProductWithFilesController = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     const mainImage = files?.mainImage?.[0];
@@ -152,14 +158,10 @@ export const createProductWithFilesController = async (req: Request, res: Respon
     const product = await createProductWithFiles(
       req.body,
       mainImage,
-      additionalImages
+      additionalImages,
     );
-    
-    return (res as any).success(
-      "Product created successfully",
-      product,
-      201,
-    );
+
+    return (res as any).success("Product created successfully", product, 201);
   } catch (error) {
     return (res as any).fail(
       "Failed to create product",
@@ -173,7 +175,11 @@ export const createProductWithFilesController = async (req: Request, res: Respon
 export const getAllProductsController = async (req: Request, res: Response) => {
   try {
     const products = await getAllProducts();
-    return (res as any).success("Products retrieved successfully", products, 200);
+    return (res as any).success(
+      "Products retrieved successfully",
+      products,
+      200,
+    );
   } catch (error) {
     return (res as any).fail(
       "Failed to get products",
@@ -239,7 +245,10 @@ export const deleteProductController = async (req: Request, res: Response) => {
   }
 };
 
-export const createProductImageController = async (req: Request, res: Response) => {
+export const createProductImageController = async (
+  req: Request,
+  res: Response,
+) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return (res as any).fail(
@@ -267,11 +276,18 @@ export const createProductImageController = async (req: Request, res: Response) 
   }
 };
 
-export const getProductImagesController = async (req: Request, res: Response) => {
+export const getProductImagesController = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const productId = req.params.productId;
     const images = await getProductImages(productId);
-    return (res as any).success("Product images retrieved successfully", images, 200);
+    return (res as any).success(
+      "Product images retrieved successfully",
+      images,
+      200,
+    );
   } catch (error) {
     return (res as any).fail(
       "Failed to get product images",
@@ -282,7 +298,10 @@ export const getProductImagesController = async (req: Request, res: Response) =>
   }
 };
 
-export const updateProductImageController = async (req: Request, res: Response) => {
+export const updateProductImageController = async (
+  req: Request,
+  res: Response,
+) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return (res as any).fail(
@@ -296,7 +315,11 @@ export const updateProductImageController = async (req: Request, res: Response) 
   try {
     const imageId = req.params.id;
     const image = await updateProductImage(imageId, req.body);
-    return (res as any).success("Product image updated successfully", image, 200);
+    return (res as any).success(
+      "Product image updated successfully",
+      image,
+      200,
+    );
   } catch (error) {
     return (res as any).fail(
       "Failed to update product image",
@@ -307,11 +330,18 @@ export const updateProductImageController = async (req: Request, res: Response) 
   }
 };
 
-export const deleteProductImageController = async (req: Request, res: Response) => {
+export const deleteProductImageController = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const imageId = req.params.id;
     const result = await deleteProductImage(imageId);
-    return (res as any).success("Product image deleted successfully", result, 200);
+    return (res as any).success(
+      "Product image deleted successfully",
+      result,
+      200,
+    );
   } catch (error) {
     return (res as any).fail(
       "Failed to delete product image",

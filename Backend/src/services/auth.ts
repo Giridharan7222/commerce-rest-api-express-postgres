@@ -3,7 +3,11 @@ import jwt, { SignOptions } from "jsonwebtoken";
 import { User, CustomerProfile, AdminProfile, Address } from "../models";
 import { LoginDto } from "../dtos/user";
 import { UserRole } from "../enums/user";
-import { JwtPayload, JwtProfilePayload, JwtAddressPayload } from "../interfaces/jwt";
+import {
+  JwtPayload,
+  JwtProfilePayload,
+  JwtAddressPayload,
+} from "../interfaces/jwt";
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "24h";
@@ -28,11 +32,13 @@ export async function loginUser(dto: LoginDto) {
   // Fetch profile based on role
   let profileData = null;
   if (user.role === UserRole.CUSTOMER) {
-    const profile = await CustomerProfile.findOne({ where: { user_id: user.id } });
+    const profile = await CustomerProfile.findOne({
+      where: { user_id: user.id },
+    });
     if (profile) {
       profileData = {
-        full_name: profile.full_name || '',
-        phone: profile.phone || '',
+        full_name: profile.full_name || "",
+        phone: profile.phone || "",
       };
     }
   } else if (user.role === UserRole.ADMIN) {
@@ -47,7 +53,7 @@ export async function loginUser(dto: LoginDto) {
 
   // Fetch addresses
   const addresses = await Address.findAll({ where: { user_id: user.id } });
-  const addressesData: JwtAddressPayload[] = addresses.map(addr => ({
+  const addressesData: JwtAddressPayload[] = addresses.map((addr) => ({
     phone: addr.phone,
     address_line1: addr.address_line1,
     address_line2: addr.address_line2,
@@ -66,11 +72,9 @@ export async function loginUser(dto: LoginDto) {
     addresses: addressesData,
   };
 
-  const token = jwt.sign(
-    tokenPayload,
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN } as SignOptions,
-  );
+  const token = jwt.sign(tokenPayload, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
+  } as SignOptions);
 
   const { password, ...userWithoutPassword } = user.get({ plain: true });
 
@@ -90,11 +94,13 @@ export async function refreshToken(userId: string) {
   // Fetch profile based on role
   let profileData = null;
   if (user.role === UserRole.CUSTOMER) {
-    const profile = await CustomerProfile.findOne({ where: { user_id: user.id } });
+    const profile = await CustomerProfile.findOne({
+      where: { user_id: user.id },
+    });
     if (profile) {
       profileData = {
-        full_name: profile.full_name || '',
-        phone: profile.phone || '',
+        full_name: profile.full_name || "",
+        phone: profile.phone || "",
       };
     }
   } else if (user.role === UserRole.ADMIN) {
@@ -109,7 +115,7 @@ export async function refreshToken(userId: string) {
 
   // Fetch addresses
   const addresses = await Address.findAll({ where: { user_id: user.id } });
-  const addressesData: JwtAddressPayload[] = addresses.map(addr => ({
+  const addressesData: JwtAddressPayload[] = addresses.map((addr) => ({
     phone: addr.phone,
     address_line1: addr.address_line1,
     address_line2: addr.address_line2,
@@ -128,11 +134,9 @@ export async function refreshToken(userId: string) {
     addresses: addressesData,
   };
 
-  const token = jwt.sign(
-    tokenPayload,
-    JWT_SECRET,
-    { expiresIn: JWT_EXPIRES_IN } as SignOptions,
-  );
+  const token = jwt.sign(tokenPayload, JWT_SECRET, {
+    expiresIn: JWT_EXPIRES_IN,
+  } as SignOptions);
 
   const { password, ...userWithoutPassword } = user.get({ plain: true });
 
