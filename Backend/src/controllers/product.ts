@@ -16,6 +16,7 @@ import {
   getProductImages,
   updateProductImage,
   deleteProductImage,
+  getFilteredProducts,
 } from "../services/product";
 
 export const createCategoryController = async (req: Request, res: Response) => {
@@ -346,6 +347,39 @@ export const deleteProductImageController = async (
     return (res as any).fail(
       "Failed to delete product image",
       "DELETE_PRODUCT_IMAGE_ERROR",
+      (error as any).message,
+      500,
+    );
+  }
+};
+
+export const getFilteredProductsController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const hasFilters = req.query.search || req.query.categoryId || req.query.minPrice || req.query.maxPrice || req.query.page || req.query.limit;
+    
+    if (!hasFilters) {
+      const products = await getAllProducts();
+      return (res as any).success("Products retrieved successfully", products, 200);
+    }
+    
+    const filters = {
+      search: req.query.search as string,
+      categoryId: req.query.categoryId as string,
+      minPrice: req.query.minPrice ? Number(req.query.minPrice) : undefined,
+      maxPrice: req.query.maxPrice ? Number(req.query.maxPrice) : undefined,
+      page: req.query.page ? Number(req.query.page) : 1,
+      limit: req.query.limit ? Number(req.query.limit) : 10,
+    };
+    
+    const result = await getFilteredProducts(filters);
+    return (res as any).success("Products retrieved successfully", result, 200);
+  } catch (error) {
+    return (res as any).fail(
+      "Failed to get products",
+      "GET_PRODUCTS_ERROR",
       (error as any).message,
       500,
     );

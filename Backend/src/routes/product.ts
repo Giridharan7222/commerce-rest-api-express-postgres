@@ -7,7 +7,6 @@ import {
   deleteCategoryController,
   createProductController,
   createProductWithFilesController,
-  getAllProductsController,
   getProductController,
   updateProductController,
   deleteProductController,
@@ -15,6 +14,7 @@ import {
   getProductImagesController,
   updateProductImageController,
   deleteProductImageController,
+  getFilteredProductsController,
 } from "../controllers/product";
 import {
   createCategoryValidation,
@@ -23,6 +23,7 @@ import {
   updateProductValidation,
   createProductImageValidation,
   updateProductImageValidation,
+  productFiltersValidation,
 } from "../validators/product";
 import { upload } from "../middleware/upload";
 import { authenticateToken, requireRole } from "../middleware/auth";
@@ -70,7 +71,7 @@ router.post(
   ]),
   createProductWithFilesController,
 );
-router.get("/products", getAllProductsController);
+router.get("/products", productFiltersValidation, getFilteredProductsController);
 router.get("/products/:id", getProductController);
 router.put(
   "/products/:id",

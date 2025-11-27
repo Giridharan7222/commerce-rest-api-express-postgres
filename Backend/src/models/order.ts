@@ -17,6 +17,7 @@ import {
 import User from "./users";
 import OrderItem from "./orderItem";
 import Invoice from "./invoice";
+import PaymentTransaction from "./paymentTransaction";
 
 export enum OrderStatus {
   PENDING = "pending",
@@ -101,4 +102,7 @@ export default class Order extends Model {
 
   @HasOne(() => Invoice)
   invoice!: Invoice;
+
+  @HasMany(() => PaymentTransaction)
+  transactions!: PaymentTransaction[];
 }

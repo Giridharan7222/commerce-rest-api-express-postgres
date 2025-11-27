@@ -5,11 +5,14 @@ import {
   UpdateProductDto,
   CreateProductImageDto,
   UpdateProductImageDto,
+  ProductFiltersDto,
+  ProductListResponseDto,
 } from "../dtos/product";
 import Category from "../models/category";
 import Product from "../models/product";
 import ProductImage from "../models/productImage";
 import { uploadFile } from "../utils/cloudinary";
+import { Op } from "sequelize";
 
 export async function createCategory(dto: CreateCategoryDto) {
   // Check for duplicate category name
@@ -239,4 +242,53 @@ export async function deleteProductImage(imageId: string) {
 
   await image.destroy();
   return { message: "Product image deleted successfully" };
+}
+
+export async function getFilteredProducts(filters: ProductFiltersDto): Promise<ProductListResponseDto> {
+  const { search, categoryId, minPrice, maxPrice, page = 1, limit = 10 } = filters;
+  
+  const whereClause: any = { isActive: true };
+  
+  if (search) {
+    whereClause.name = { [Op.iLike]: `%${search}%` };
+  }
+  
+  if (categoryId) {
+    whereClause.categoryId = categoryId;
+  }
+  
+  if (minPrice !== undefined || maxPrice !== undefined) {
+    whereClause.price = {};
+    if (minPrice !== undefined) {
+      whereClause.price[Op.gte] = minPrice;
+    }
+    if (maxPrice !== undefined) {
+      whereClause.price[Op.lte] = maxPrice;
+    }
+  }
+  
+  const offset = (page - 1) * limit;
+  
+  const { count, rows } = await Product.findAndCountAll({
+    where: whereClause,
+    include: [
+      { model: Category, as: "category" },
+      { model: ProductImage, as: "productImages" },
+    ],
+    order: [["created_at", "DESC"]],
+    limit,
+    offset,
+  });
+  
+  const products = rows.map((product: any) => product.get({ plain: true }));
+  
+  return {
+    products,
+    pagination: {
+      currentPage: page,
+      totalPages: Math.ceil(count / limit),
+      totalItems: count,
+      itemsPerPage: limit,
+    },
+  };
 }

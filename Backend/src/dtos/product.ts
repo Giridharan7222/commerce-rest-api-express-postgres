@@ -41,3 +41,22 @@ export interface UpdateProductImageDto {
   imageUrl?: string;
   publicId?: string;
 }
+
+export interface ProductFiltersDto {
+  search?: string;
+  categoryId?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  page?: number;
+  limit?: number;
+}
+
+export interface ProductListResponseDto {
+  products: any[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
+}

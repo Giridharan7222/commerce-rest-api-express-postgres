@@ -93,6 +93,24 @@ const options = {
             updated_at: { type: "string", format: "date-time" },
           },
         },
+        ProductListResponse: {
+          type: "object",
+          properties: {
+            products: {
+              type: "array",
+              items: { $ref: "#/components/schemas/Product" },
+            },
+            pagination: {
+              type: "object",
+              properties: {
+                currentPage: { type: "integer" },
+                totalPages: { type: "integer" },
+                totalItems: { type: "integer" },
+                itemsPerPage: { type: "integer" },
+              },
+            },
+          },
+        },
       },
     },
   },

@@ -1,5 +1,5 @@
 import { Request } from "express";
-import { body } from "express-validator";
+import { body, query } from "express-validator";
 
 export const createCategoryValidation = [
   body("name").notEmpty().withMessage("Name is required"),
@@ -87,3 +87,12 @@ export function createProductImagePayload(req: Request) {
     publicId: req.body.publicId,
   };
 }
+
+export const productFiltersValidation = [
+  query("search").optional().isString().withMessage("Search must be a string"),
+  query("categoryId").optional().isUUID().withMessage("Category ID must be a valid UUID"),
+  query("minPrice").optional().isFloat({ min: 0 }).withMessage("Min price must be a positive number"),
+  query("maxPrice").optional().isFloat({ min: 0 }).withMessage("Max price must be a positive number"),
+  query("page").optional().isInt({ min: 1 }).withMessage("Page must be a positive integer"),
+  query("limit").optional().isInt({ min: 1, max: 100 }).withMessage("Limit must be between 1 and 100"),
+];
