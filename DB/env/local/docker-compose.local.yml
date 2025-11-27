@@ -4,7 +4,9 @@ services:
     image: postgis/postgis:16-3.5
     platform: linux/amd64
     ports:
-      - "5433:5432"
+      - "5433:5433"
+    environment:
+      - PGPORT=5433
     networks:
       - db-net
     security_opt:
