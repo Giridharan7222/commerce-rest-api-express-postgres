@@ -7,7 +7,7 @@ Complete PostgreSQL database schema for a full-featured e-commerce platform with
 - **Database**: PostgreSQL 16.9 with PostGIS extensions
 - **Port**: 5433
 - **Migration Tool**: Flyway
-- **Total Tables**: 13 core tables + system tables
+- **Total Tables**: 18 core tables + system tables
 
 ## Quick Start
 ```bash
@@ -45,11 +45,20 @@ psql -h localhost -p 5433 -U dbuser -d mydb
 | `orders` | Order headers | Status tracking, payment info, JSON address |
 | `order_items` | Order line items | Price at order time, quantity |
 
+### 💰 Financial & Billing
+| Table | Description | Key Features |
+|-------|-------------|--------------|
+| `invoices` | Legal billing documents | Invoice numbers, tax calculations, status tracking |
+| `invoice_line_items` | Invoice line details | Historical pricing snapshots, tax per item |
+| `payment_transactions` | Payment gateway tracking | Transaction refs, gateway responses, refunds |
+
 ### ⚙️ System Management
 | Table | Description | Key Features |
 |-------|-------------|--------------|
 | `system_configs` | App configuration | Flexible key-value with JSON support |
 | `api_logs` | Request logging | HTTP method, endpoint, IP tracking |
+| `admin_activity_logs` | Admin audit trail | Change tracking, compliance, rollback support |
+| `system_health` | Server monitoring | Uptime, CPU/memory usage, performance metrics |
 
 ## Relationships
 
@@ -67,6 +76,11 @@ products (1) ──── (N) cart_items
 products (1) ──── (N) order_items
 
 orders (1) ──── (N) order_items
+orders (1) ──── (N) invoices
+orders (1) ──── (N) payment_transactions
+
+invoices (1) ──── (N) invoice_line_items
+invoices (1) ──── (N) payment_transactions
 ```
 
 ## ENUM Types
@@ -85,6 +99,11 @@ orders (1) ──── (N) order_items
 - `config_scope`: global, admin, customer, user
 - `config_role`: admin, customer, all
 - `http_method`: GET, POST, PUT, PATCH, DELETE, OPTIONS, HEAD
+
+### Financial & Billing
+- `invoice_status`: generated, paid, cancelled
+- `transaction_status`: initiated, pending, successful, failed, refunded
+- `server_status`: UP, DOWN, MAINTENANCE, DEGRADED
 
 ## Key Features
 
@@ -128,6 +147,11 @@ orders (1) ──── (N) order_items
 | V1011 | api_logs_table.sql | API request logging |
 | V1012 | add_enums.sql | ENUM type definitions |
 | V1013 | system_configs_table.sql | Application configuration |
+| V1014 | admin_activity_logs_table.sql | Admin audit trail |
+| V1015 | system_health_table.sql | System monitoring |
+| V1016 | invoices_table.sql | Legal billing documents |
+| V1017 | invoice_line_items_table.sql | Invoice line details |
+| V1018 | payment_transactions_table.sql | Payment gateway tracking |
 
 ## Sample Queries
 
@@ -154,6 +178,30 @@ ORDER BY o.created_at DESC;
 SELECT value, json_value 
 FROM system_configs 
 WHERE key = 'ORDER_MIN_AMOUNT' AND is_active = true;
+```
+
+### Get invoice with line items
+```sql
+SELECT i.invoice_number, i.total_amount, ili.product_name, ili.quantity, ili.price
+FROM invoices i
+JOIN invoice_line_items ili ON i.id = ili.invoice_id
+WHERE i.order_id = 'order-uuid';
+```
+
+### Track payment status
+```sql
+SELECT pt.transaction_reference, pt.status, pt.amount, pt.gateway_response
+FROM payment_transactions pt
+WHERE pt.order_id = 'order-uuid'
+ORDER BY pt.created_at DESC;
+```
+
+### Admin activity audit
+```sql
+SELECT aal.action, aal.target_table, aal.before_data, aal.after_data, u.email
+FROM admin_activity_logs aal
+JOIN users u ON aal.admin_id = u.id
+WHERE aal.target_table = 'products' AND aal.target_id = 'product-uuid';
 ```
 
 ## Environment Variables
