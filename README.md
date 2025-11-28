@@ -1,5 +1,3 @@
-# Backend API
-
 A RESTful API backend for a commerce application built with Node.js, TypeScript, and PostgreSQL.
 
 ## Prerequisites

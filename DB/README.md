@@ -1,4 +1,33 @@
-# PostgreSQL Database with Flyway Migrations
+# Database Setup
+
+PostgreSQL database with Flyway migrations for the commerce application.
+
+## Database Structure
+
+![Database Schema](ecommerce.png)
+*Database table relationships and structure*
+
+### Core Tables (24 tables)
+- **users** - User accounts (customers & admins)
+- **customer_profiles** - Customer profile information
+- **admin_profiles** - Admin profile information
+- **addresses** - User addresses
+- **categories** - Product categories
+- **products** - Product catalog
+- **product_images** - Product image management
+- **cart_items** - Shopping cart functionality
+- **orders** - Order management
+- **order_items** - Order line items
+- **invoices** - Invoice generation
+- **invoice_line_items** - Invoice details
+- **payment_transactions** - Payment processing
+- **payment_methods** - Payment method storage
+- **refunds** - Refund management
+- **stripe_customers** - Stripe integration
+- **system_configs** - System configuration
+- **system_health** - Health monitoring
+- **admin_activity_logs** - Admin activity tracking
+- **api_logs** - API request logging
 
 ## Quick Start
 
@@ -12,29 +41,19 @@
 
 ## Database Access
 
-### PostgreSQL
 - **Host**: localhost:5433
 - **User**: dbuser
 - **Database**: mydb
 - **Password**: dbpass123
 
-## Migration Files
-- **Schema**: `migrations/schema/V{version}__{description}.sql`
-- **Seeders**: `migrations/seeder/V{version}__{description}.sql`
-- **Views**: `migrations/views/R__{description}.sql`
+## Migration Structure
 
-## Services
-- **PostgreSQL**: PostGIS-enabled database (port 5433)
-- **Flyway**: Automatic migration runner
+- **Schema**: `migrations/schema/V{version}__{description}.sql` - Database structure (V1001-V1024)
+- **Seeders**: `migrations/seeder/V{version}__{description}.sql` - Initial data (V2001-V2005)
+- **Views**: `migrations/views/R__{description}.sql` - Database views
 
-## PostgreSQL Management
+## Additional Information
 
-**Connect via psql:**
-```bash
-psql -h localhost -p 5433 -U dbuser -d mydb
-```
-
-**GUI Tools:**
-- **pgAdmin**: Official PostgreSQL administration tool
-- **DBeaver**: Free universal database tool
-- **DataGrip**: JetBrains database IDE
+For detailed documentation:
+- **Database schema details**: See `readme/DATABASE_SCHEMA.md`
+- **Backend API integration**: See `../Backend/README.md`
