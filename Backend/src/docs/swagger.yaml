@@ -29,6 +29,8 @@ tags:
     description: Stripe payment integration
   - name: Payment Methods
     description: Saved payment methods
+  - name: System Health
+    description: System health monitoring
 
 components:
   securitySchemes:
@@ -449,6 +451,52 @@ components:
               type: integer
             itemsPerPage:
               type: integer
+
+    SystemHealth:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        server_status:
+          type: string
+          enum: [UP, DOWN, MAINTENANCE, DEGRADED]
+        cpu_usage:
+          type: number
+          minimum: 0
+          maximum: 100
+        memory_usage:
+          type: number
+          minimum: 0
+          maximum: 100
+        disk_usage:
+          type: number
+          minimum: 0
+          maximum: 100
+        checked_at:
+          type: string
+          format: date-time
+
+    SystemHealthInput:
+      type: object
+      required:
+        - server_status
+      properties:
+        server_status:
+          type: string
+          enum: [UP, DOWN, MAINTENANCE, DEGRADED]
+        cpu_usage:
+          type: number
+          minimum: 0
+          maximum: 100
+        memory_usage:
+          type: number
+          minimum: 0
+          maximum: 100
+        disk_usage:
+          type: number
+          minimum: 0
+          maximum: 100
 
 paths:
   /health:
@@ -1368,3 +1416,82 @@ paths:
       responses:
         "200":
           description: Product image deleted successfully
+
+  # System Health endpoints
+  /api/system-health:
+    get:
+      summary: Get current system health status
+      tags: [System Health]
+      security:
+        - bearerAuth: []
+      description: |
+        🔐 **Admin Only**: This endpoint requires admin authentication.
+        
+        Retrieves the latest system health status including server status and resource usage metrics.
+      responses:
+        "200":
+          description: System health retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "System health retrieved successfully"
+                  data:
+                    $ref: '#/components/schemas/SystemHealth'
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "403":
+          description: Forbidden - Admin access required
+    post:
+      summary: Create system health record
+      tags: [System Health]
+      security:
+        - bearerAuth: []
+      description: |
+        🔐 **Admin Only**: This endpoint requires admin authentication.
+        
+        Creates a new system health record with server status and optional resource usage metrics.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SystemHealthInput'
+            examples:
+              basicHealth:
+                summary: Basic health status
+                value:
+                  server_status: "UP"
+              detailedHealth:
+                summary: Detailed health with metrics
+                value:
+                  server_status: "UP"
+                  cpu_usage: 45.2
+                  memory_usage: 67.8
+                  disk_usage: 23.1
+      responses:
+        "201":
+          description: System health record created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "System health record created successfully"
+                  data:
+                    $ref: '#/components/schemas/SystemHealth'
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "403":
+          description: Forbidden - Admin access required

@@ -147,6 +147,33 @@ const options = {
             },
           },
         },
+        SystemHealth: {
+          type: "object",
+          properties: {
+            id: { type: "string", format: "uuid" },
+            server_status: {
+              type: "string",
+              enum: ["UP", "DOWN", "MAINTENANCE", "DEGRADED"]
+            },
+            cpu_usage: { type: "number", minimum: 0, maximum: 100 },
+            memory_usage: { type: "number", minimum: 0, maximum: 100 },
+            disk_usage: { type: "number", minimum: 0, maximum: 100 },
+            checked_at: { type: "string", format: "date-time" }
+          }
+        },
+        SystemHealthInput: {
+          type: "object",
+          required: ["server_status"],
+          properties: {
+            server_status: {
+              type: "string",
+              enum: ["UP", "DOWN", "MAINTENANCE", "DEGRADED"]
+            },
+            cpu_usage: { type: "number", minimum: 0, maximum: 100 },
+            memory_usage: { type: "number", minimum: 0, maximum: 100 },
+            disk_usage: { type: "number", minimum: 0, maximum: 100 }
+          }
+        },
       },
     },
   },
@@ -161,6 +188,7 @@ const options = {
     "./src/docs/swagger/order.swagger.yaml",
     "./src/docs/swagger/stripe.swagger.yaml",
     "./src/docs/swagger/payment-methods.swagger.yaml",
+    "./src/docs/swagger/system-health.swagger.yaml",
     "./src/app.ts",
   ],
 };
