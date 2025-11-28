@@ -3,32 +3,102 @@ paths:
     post:
       summary: Create user profile
       tags: [Profiles]
+      security:
+        - bearerAuth: []
+      description: |
+        🔐 **Authentication Required**: This endpoint uses JWT token authentication.
+
+        **User ID Extraction**: The user_id is automatically extracted from the JWT token, so it should NOT be included in the request body.
+
+        **Supported Input Formats**:
+        - firstName + lastName (recommended)
+        - full_name (alternative)
+        - dateOfBirth or dob for date of birth
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/UserProfile"
+            examples:
+              withFirstLastName:
+                summary: Using firstName and lastName
+                value:
+                  firstName: "John"
+                  lastName: "Doe"
+                  phone: "+1234567890"
+                  dateOfBirth: "1990-01-15"
+              withFullName:
+                summary: Using full_name
+                value:
+                  full_name: "John Doe"
+                  phone: "+1234567890"
+                  dob: "1990-01-15"
       responses:
         "201":
           description: Profile created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Profile created successfully"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                        format: uuid
+                      user_id:
+                        type: string
+                        format: uuid
+                      full_name:
+                        type: string
+                        example: "John Doe"
+                      phone:
+                        type: string
+                        example: "+1234567890"
+                      dob:
+                        type: string
+                        format: date
+                        example: "1990-01-15"
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "400":
+          description: Bad Request - Validation errors
 
-  /api/users/{id}/profile:
     put:
       summary: Update user profile
       tags: [Profiles]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      security:
+        - bearerAuth: []
+      description: |
+        🔐 **Authentication Required**: This endpoint uses JWT token authentication.
+
+        **User ID Extraction**: The user_id is automatically extracted from the JWT token.
+
+        Updates the profile for the authenticated user. All fields are optional for updates.
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: "#/components/schemas/UserProfile"
+            examples:
+              partialUpdate:
+                summary: Partial profile update
+                value:
+                  phone: "+1987654321"
+                  dateOfBirth: "1985-06-20"
       responses:
         "200":
           description: Profile updated successfully
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "404":
+          description: Profile not found

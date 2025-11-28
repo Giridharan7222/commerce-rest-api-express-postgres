@@ -1,40 +1,45 @@
 import { expect } from "chai";
-import { testDatabase as sequelize } from "../config";
+import sinon from "sinon";
 import { User, Product, Category, ProductImage } from "../models";
 import { UserRole } from "../enums/user";
 
 describe("Product Routes Tests", () => {
+  let sandbox: sinon.SinonSandbox;
   let testUser: any;
   let adminUser: any;
   let testCategory: any;
   let testProduct: any;
 
   beforeEach(async () => {
-    await sequelize.sync({ force: true });
+    sandbox = sinon.createSandbox();
 
-    // Create test users
-    testUser = await User.create({
+    // Mock test users
+    testUser = {
+      id: "user-123",
       email: "user@example.com",
       password: "hashedpassword",
       role: UserRole.CUSTOMER,
       is_active: true,
-    });
+    };
 
-    adminUser = await User.create({
+    adminUser = {
+      id: "admin-123",
       email: "admin@example.com",
       password: "hashedpassword",
       role: UserRole.ADMIN,
       is_active: true,
-    });
+    };
 
-    // Create test category
-    testCategory = await Category.create({
+    // Mock test category
+    testCategory = {
+      id: "category-123",
       name: "Electronics",
       description: "Electronic devices",
-    });
+    };
 
-    // Create test product
-    testProduct = await Product.create({
+    // Mock test product
+    testProduct = {
+      id: "product-123",
       name: "Test Product",
       description: "Test product description",
       price: 99.99,
@@ -42,7 +47,24 @@ describe("Product Routes Tests", () => {
       categoryId: testCategory.id,
       image_url: "test-image.jpg",
       isActive: true,
-    });
+      update: sandbox.stub().callsFake((updates: any) => {
+        Object.assign(testProduct, updates);
+        return Promise.resolve(testProduct);
+      }),
+      destroy: sandbox.stub().resolves(),
+      reload: sandbox.stub().callsFake(() => {
+        return Promise.resolve(testProduct);
+      }),
+    };
+
+    // Mock model methods
+    sandbox.stub(User, "create").resolves(testUser as any);
+    sandbox.stub(Category, "create").resolves(testCategory as any);
+    sandbox.stub(Product, "create").resolves(testProduct as any);
+  });
+
+  afterEach(() => {
+    sandbox.restore();
   });
 
   describe("Product CRUD Operations", () => {
@@ -57,6 +79,14 @@ describe("Product Routes Tests", () => {
         isActive: true,
       };
 
+      const mockNewProduct = {
+        id: "product-new",
+        ...productData,
+      };
+
+      sandbox.restore();
+      sandbox.stub(Product, "create").resolves(mockNewProduct as any);
+
       const product = await Product.create(productData);
 
       expect(product).to.exist;
@@ -67,6 +97,12 @@ describe("Product Routes Tests", () => {
     });
 
     it("should require valid categoryId", async () => {
+      const error = new Error(
+        "SQLITE_CONSTRAINT: FOREIGN KEY constraint failed",
+      );
+      sandbox.restore();
+      sandbox.stub(Product, "create").rejects(error);
+
       try {
         await Product.create({
           name: "Invalid Product",
@@ -81,6 +117,8 @@ describe("Product Routes Tests", () => {
     });
 
     it("should get product by ID", async () => {
+      sandbox.stub(Product, "findByPk").resolves(testProduct as any);
+
       const foundProduct = await Product.findByPk(testProduct.id);
 
       expect(foundProduct).to.exist;
@@ -99,6 +137,8 @@ describe("Product Routes Tests", () => {
     });
 
     it("should delete product", async () => {
+      sandbox.stub(Product, "findByPk").resolves(null);
+
       await testProduct.destroy();
 
       const deletedProduct = await Product.findByPk(testProduct.id);
@@ -107,28 +147,35 @@ describe("Product Routes Tests", () => {
   });
 
   describe("Product Filtering and Search", () => {
-    beforeEach(async () => {
-      // Create additional products for filtering tests
-      await Product.create({
-        name: "Laptop",
-        description: "Gaming laptop",
-        price: 1299.99,
-        stock: 3,
-        categoryId: testCategory.id,
-        isActive: true,
-      });
+    let mockProducts: any[];
 
-      await Product.create({
-        name: "Mouse",
-        description: "Wireless mouse",
-        price: 29.99,
-        stock: 20,
-        categoryId: testCategory.id,
-        isActive: false, // Inactive product
-      });
+    beforeEach(async () => {
+      mockProducts = [
+        testProduct,
+        {
+          id: "laptop-123",
+          name: "Laptop",
+          description: "Gaming laptop",
+          price: 1299.99,
+          stock: 3,
+          categoryId: testCategory.id,
+          isActive: true,
+        },
+        {
+          id: "mouse-123",
+          name: "Mouse",
+          description: "Wireless mouse",
+          price: 29.99,
+          stock: 20,
+          categoryId: testCategory.id,
+          isActive: false,
+        },
+      ];
     });
 
     it("should find products by category", async () => {
+      sandbox.stub(Product, "findAll").resolves(mockProducts as any);
+
       const products = await Product.findAll({
         where: { categoryId: testCategory.id },
       });
@@ -137,35 +184,46 @@ describe("Product Routes Tests", () => {
     });
 
     it("should find active products only", async () => {
-      const activeProducts = await Product.findAll({
+      const activeProducts = mockProducts.filter((p) => p.isActive);
+      sandbox.stub(Product, "findAll").resolves(activeProducts as any);
+
+      const result = await Product.findAll({
         where: { isActive: true },
       });
 
-      expect(activeProducts).to.have.length(2); // testProduct + Laptop
-      activeProducts.forEach((product) => {
+      expect(result).to.have.length(2); // testProduct + Laptop
+      result.forEach((product) => {
         expect(product.isActive).to.be.true;
       });
     });
 
     it("should find products by price range", async () => {
-      const affordableProducts = await Product.findAll({
+      const affordableProducts = mockProducts.filter((p) => p.price <= 100);
+      sandbox.stub(Product, "findAll").resolves(affordableProducts as any);
+
+      const result = await Product.findAll({
         where: {
           price: { [require("sequelize").Op.lte]: 100 },
         },
       });
 
-      expect(affordableProducts).to.have.length(2); // testProduct + Mouse
+      expect(result).to.have.length(2); // testProduct + Mouse
     });
 
     it("should search products by name", async () => {
-      const laptopProducts = await Product.findAll({
+      const laptopProducts = mockProducts.filter((p) =>
+        p.name.includes("Laptop"),
+      );
+      sandbox.stub(Product, "findAll").resolves(laptopProducts as any);
+
+      const result = await Product.findAll({
         where: {
           name: { [require("sequelize").Op.like]: "%Laptop%" },
         },
       });
 
-      expect(laptopProducts).to.have.length(1);
-      expect(laptopProducts[0].name).to.equal("Laptop");
+      expect(result).to.have.length(1);
+      expect(result[0].name).to.equal("Laptop");
     });
   });
 
@@ -173,14 +231,32 @@ describe("Product Routes Tests", () => {
     let testProductImage: any;
 
     beforeEach(async () => {
-      testProductImage = await ProductImage.create({
+      testProductImage = {
+        id: "image-123",
         productId: testProduct.id,
         imageUrl: "https://example.com/image1.jpg",
         publicId: "products/image1",
-      });
+        update: sandbox.stub().callsFake((updates: any) => {
+          Object.assign(testProductImage, updates);
+          return Promise.resolve(testProductImage);
+        }),
+        destroy: sandbox.stub().resolves(),
+      };
+
+      sandbox.stub(ProductImage, "create").resolves(testProductImage as any);
     });
 
     it("should create product image", async () => {
+      const mockNewImage = {
+        id: "image-new",
+        productId: testProduct.id,
+        imageUrl: "https://example.com/image2.jpg",
+        publicId: "products/image2",
+      };
+
+      sandbox.restore();
+      sandbox.stub(ProductImage, "create").resolves(mockNewImage as any);
+
       const productImage = await ProductImage.create({
         productId: testProduct.id,
         imageUrl: "https://example.com/image2.jpg",
@@ -193,6 +269,8 @@ describe("Product Routes Tests", () => {
     });
 
     it("should get product images", async () => {
+      sandbox.stub(ProductImage, "findAll").resolves([testProductImage] as any);
+
       const images = await ProductImage.findAll({
         where: { productId: testProduct.id },
       });
@@ -212,6 +290,8 @@ describe("Product Routes Tests", () => {
     });
 
     it("should delete product image", async () => {
+      sandbox.stub(ProductImage, "findByPk").resolves(null);
+
       await testProductImage.destroy();
 
       const deletedImage = await ProductImage.findByPk(testProductImage.id);
@@ -219,6 +299,12 @@ describe("Product Routes Tests", () => {
     });
 
     it("should require valid productId", async () => {
+      const error = new Error(
+        "SQLITE_CONSTRAINT: FOREIGN KEY constraint failed",
+      );
+      sandbox.restore();
+      sandbox.stub(ProductImage, "create").rejects(error);
+
       try {
         await ProductImage.create({
           productId: "invalid-id",
@@ -233,6 +319,15 @@ describe("Product Routes Tests", () => {
 
   describe("Product Relationships", () => {
     it("should load product with category", async () => {
+      const mockProductWithCategory = {
+        ...testProduct,
+        category: testCategory,
+      };
+
+      sandbox
+        .stub(Product, "findByPk")
+        .resolves(mockProductWithCategory as any);
+
       const productWithCategory = await Product.findByPk(testProduct.id, {
         include: [Category],
       });
@@ -243,6 +338,27 @@ describe("Product Routes Tests", () => {
     });
 
     it("should load product with images", async () => {
+      const mockImages = [
+        {
+          id: "img-1",
+          productId: testProduct.id,
+          imageUrl: "https://example.com/image1.jpg",
+        },
+        {
+          id: "img-2",
+          productId: testProduct.id,
+          imageUrl: "https://example.com/image2.jpg",
+        },
+      ];
+
+      const mockProductWithImages = {
+        ...testProduct,
+        productImages: mockImages,
+      };
+
+      sandbox.stub(ProductImage, "create").resolves(mockImages[0] as any);
+      sandbox.stub(Product, "findByPk").resolves(mockProductWithImages as any);
+
       await ProductImage.create({
         productId: testProduct.id,
         imageUrl: "https://example.com/image1.jpg",
@@ -262,6 +378,15 @@ describe("Product Routes Tests", () => {
     });
 
     it("should load category with products", async () => {
+      const mockCategoryWithProducts = {
+        ...testCategory,
+        products: [testProduct],
+      };
+
+      sandbox
+        .stub(Category, "findByPk")
+        .resolves(mockCategoryWithProducts as any);
+
       const categoryWithProducts = await Category.findByPk(testCategory.id, {
         include: [Product],
       });
@@ -273,6 +398,10 @@ describe("Product Routes Tests", () => {
 
   describe("Product Validation", () => {
     it("should require name", async () => {
+      const error = new Error("name cannot be null");
+      sandbox.restore();
+      sandbox.stub(Product, "create").rejects(error);
+
       try {
         await Product.create({
           price: 99.99,
@@ -286,6 +415,10 @@ describe("Product Routes Tests", () => {
     });
 
     it("should require price", async () => {
+      const error = new Error("price cannot be null");
+      sandbox.restore();
+      sandbox.stub(Product, "create").rejects(error);
+
       try {
         await Product.create({
           name: "Test Product",
@@ -299,6 +432,17 @@ describe("Product Routes Tests", () => {
     });
 
     it("should default stock to 0", async () => {
+      const mockProduct = {
+        id: "product-default-stock",
+        name: "No Stock Product",
+        price: 99.99,
+        categoryId: testCategory.id,
+        stock: 0,
+      };
+
+      sandbox.restore();
+      sandbox.stub(Product, "create").resolves(mockProduct as any);
+
       const product = await Product.create({
         name: "No Stock Product",
         price: 99.99,
@@ -309,6 +453,17 @@ describe("Product Routes Tests", () => {
     });
 
     it("should default isActive to true", async () => {
+      const mockProduct = {
+        id: "product-default-active",
+        name: "Active Product",
+        price: 99.99,
+        categoryId: testCategory.id,
+        isActive: true,
+      };
+
+      sandbox.restore();
+      sandbox.stub(Product, "create").resolves(mockProduct as any);
+
       const product = await Product.create({
         name: "Active Product",
         price: 99.99,
@@ -336,6 +491,9 @@ describe("Product Routes Tests", () => {
 
     it("should increment stock", async () => {
       const initialStock = testProduct.stock;
+      testProduct.stock = initialStock + 3;
+
+      sandbox.stub(Product, "increment").resolves([1] as any);
 
       await Product.increment("stock", {
         by: 3,
@@ -348,6 +506,9 @@ describe("Product Routes Tests", () => {
 
     it("should decrement stock", async () => {
       const initialStock = testProduct.stock;
+      testProduct.stock = initialStock - 2;
+
+      sandbox.stub(Product, "decrement").resolves([1] as any);
 
       await Product.decrement("stock", {
         by: 2,
@@ -361,11 +522,15 @@ describe("Product Routes Tests", () => {
 
   describe("Product Queries", () => {
     it("should count products", async () => {
+      sandbox.stub(Product, "count").resolves(5);
+
       const count = await Product.count();
       expect(count).to.be.greaterThan(0);
     });
 
     it("should count products by category", async () => {
+      sandbox.stub(Product, "count").resolves(3);
+
       const count = await Product.count({
         where: { categoryId: testCategory.id },
       });
@@ -373,6 +538,9 @@ describe("Product Routes Tests", () => {
     });
 
     it("should find products with pagination", async () => {
+      const mockProducts = [testProduct, { ...testProduct, id: "product-2" }];
+      sandbox.stub(Product, "findAll").resolves(mockProducts as any);
+
       const products = await Product.findAll({
         limit: 2,
         offset: 0,

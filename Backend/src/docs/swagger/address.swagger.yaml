@@ -3,59 +3,203 @@ paths:
     post:
       summary: Create user address
       tags: [Addresses]
+      security:
+        - bearerAuth: []
+      description: |
+        🔐 **Authentication Required**: This endpoint uses JWT token authentication.
+
+        **User ID Extraction**: The user_id is automatically extracted from the JWT token, so it should NOT be included in the request body.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Address"
+              type: object
+              required:
+                [full_name, phone, address_line1, city, state, pincode, country]
+              properties:
+                full_name:
+                  type: string
+                  example: "John Doe"
+                phone:
+                  type: string
+                  example: "+1234567890"
+                address_line1:
+                  type: string
+                  example: "123 Main Street"
+                address_line2:
+                  type: string
+                  example: "Apt 4B"
+                city:
+                  type: string
+                  example: "New York"
+                state:
+                  type: string
+                  example: "NY"
+                pincode:
+                  type: string
+                  example: "10001"
+                country:
+                  type: string
+                  example: "USA"
+                is_default:
+                  type: boolean
+                  default: false
+                  example: true
       responses:
         "201":
           description: Address created successfully
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "400":
+          description: Bad Request - Validation errors
 
-  /api/users/{id}/addresses:
     get:
       summary: Get user addresses
       tags: [Addresses]
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: string
+      security:
+        - bearerAuth: []
+      description: |
+        🔐 **Authentication Required**: This endpoint uses JWT token authentication.
+
+        **User ID Extraction**: The user_id is automatically extracted from the JWT token.
+
+        Returns all addresses for the authenticated user, ordered by default status and creation date.
       responses:
         "200":
           description: List of user addresses
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Addresses retrieved successfully"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                          format: uuid
+                        user_id:
+                          type: string
+                          format: uuid
+                        full_name:
+                          type: string
+                        phone:
+                          type: string
+                        address_line1:
+                          type: string
+                        address_line2:
+                          type: string
+                        city:
+                          type: string
+                        state:
+                          type: string
+                        pincode:
+                          type: string
+                        country:
+                          type: string
+                        is_default:
+                          type: boolean
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
 
   /api/addresses/{id}:
     put:
       summary: Update address
       tags: [Addresses]
+      security:
+        - bearerAuth: []
+      description: |
+        🔐 **Authentication Required**: This endpoint uses JWT token authentication.
+
+        Updates an existing address. The address must belong to the authenticated user.
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+            format: uuid
+          description: Address ID to update
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Address"
+              type: object
+              properties:
+                full_name:
+                  type: string
+                  example: "John Doe"
+                phone:
+                  type: string
+                  example: "+1234567890"
+                address_line1:
+                  type: string
+                  example: "123 Main Street"
+                address_line2:
+                  type: string
+                  example: "Apt 4B"
+                city:
+                  type: string
+                  example: "New York"
+                state:
+                  type: string
+                  example: "NY"
+                pincode:
+                  type: string
+                  example: "10001"
+                country:
+                  type: string
+                  example: "USA"
+                is_default:
+                  type: boolean
+                  example: true
       responses:
         "200":
           description: Address updated successfully
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "404":
+          description: Address not found
+        "400":
+          description: Bad Request - Validation errors
 
     delete:
       summary: Delete address
       tags: [Addresses]
+      security:
+        - bearerAuth: []
+      description: |
+        🔐 **Authentication Required**: This endpoint uses JWT token authentication.
+
+        Deletes an existing address. The address must belong to the authenticated user.
       parameters:
         - in: path
           name: id
           required: true
           schema:
             type: string
+            format: uuid
+          description: Address ID to delete
       responses:
         "200":
           description: Address deleted successfully
+        "401":
+          description: Unauthorized - Invalid or missing JWT token
+        "404":
+          description: Address not found

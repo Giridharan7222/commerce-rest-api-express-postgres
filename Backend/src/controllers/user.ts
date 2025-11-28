@@ -4,6 +4,7 @@ import {
   createUser,
   createAdmin,
   createCustomerProfile,
+  createOrUpdateCustomerProfile,
   createAdminProfile,
   createAddress,
   getUserWithProfile,
@@ -70,8 +71,12 @@ export const createUserProfile = async (req: Request, res: Response) => {
 
   try {
     const profilePayload = createCustomerProfilePayload(req);
-    const profile = await createCustomerProfile(profilePayload);
-    return (res as any).success("Profile created successfully", profile, 201);
+    const profile = await createOrUpdateCustomerProfile(profilePayload);
+    return (res as any).success(
+      "Profile created/updated successfully",
+      profile,
+      201,
+    );
   } catch (error) {
     return (res as any).fail(
       "Failed to create profile",
@@ -116,8 +121,8 @@ export const getUser = async (req: Request, res: Response) => {
 
 export const getUserAddressList = async (req: Request, res: Response) => {
   try {
-    const userId = req.params.id;
-    const addresses = await getUserAddresses(userId);
+    const user = (req as any).user;
+    const addresses = await getUserAddresses(user.id);
     return (res as any).success(
       "Addresses retrieved successfully",
       addresses,
@@ -187,9 +192,9 @@ export const updateUserProfileController = async (
   if (handleValidationErrors(req, res)) return;
 
   try {
-    const userId = req.params.id;
-    const profileData = req.body;
-    const profile = await updateUserProfile(userId, profileData);
+    const user = (req as any).user;
+    const profilePayload = createCustomerProfilePayload(req);
+    const profile = await updateUserProfile(user.id, profilePayload);
     return (res as any).success("Profile updated successfully", profile, 200);
   } catch (error) {
     return (res as any).fail(

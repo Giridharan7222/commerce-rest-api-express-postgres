@@ -69,11 +69,13 @@ userRoutes.delete(
 // Profile management
 userRoutes.post(
   "/users/profile",
+  authenticateToken,
   checkSchema(createCustomerProfileSchema),
   createUserProfile,
 );
 userRoutes.put(
-  "/users/:id/profile",
+  "/users/profile",
+  authenticateToken,
   checkSchema(createCustomerProfileSchema),
   updateUserProfileController,
 );
@@ -81,13 +83,15 @@ userRoutes.put(
 // Address management
 userRoutes.post(
   "/users/addresses",
+  authenticateToken,
   checkSchema(createAddressSchema),
   createUserAddress,
 );
-userRoutes.get("/users/:id/addresses", getUserAddressList);
+userRoutes.get("/users/addresses", authenticateToken, getUserAddressList);
 userRoutes.put(
   "/addresses/:id",
+  authenticateToken,
   checkSchema(createAddressSchema),
   updateAddressController,
 );
-userRoutes.delete("/addresses/:id", deleteAddressController);
+userRoutes.delete("/addresses/:id", authenticateToken, deleteAddressController);

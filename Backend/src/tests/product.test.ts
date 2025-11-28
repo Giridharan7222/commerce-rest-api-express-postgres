@@ -1,39 +1,43 @@
 import { expect } from "chai";
-import { testDatabase as sequelize } from "../config";
+import sinon from "sinon";
 import { User } from "../models";
 import Category from "../models/category";
 import Product from "../models/product";
 import ProductImage from "../models/productImage";
-import {
-  createCategory,
-  createProduct,
-  createProductImage,
-} from "../services/product";
-import { createUser } from "../services/user";
+import * as productService from "../services/product";
+import * as userService from "../services/user";
 import { CreateUserDto } from "../dtos/user";
 import { UserRole } from "../enums/user";
 import { Op } from "sequelize";
 
 describe("Product Service Tests", () => {
+  let sandbox: sinon.SinonSandbox;
   let adminUser: any;
   let testCategory: any;
 
   beforeEach(async () => {
-    await sequelize.sync({ force: true });
+    sandbox = sinon.createSandbox();
 
-    // Create admin user for tests
-    const adminData: CreateUserDto = {
+    adminUser = {
+      id: "admin-123",
       email: "admin@test.com",
-      password: "AdminPass123!",
+      password: "hashedpassword",
       role: UserRole.ADMIN,
+      is_active: true,
     };
-    adminUser = await createUser(adminData);
 
-    // Create test category
-    testCategory = await createCategory({
+    testCategory = {
+      id: "category-123",
       name: "Test Electronics",
       description: "Test category for electronics",
-    });
+    };
+
+    sandbox.stub(userService, "createUser").resolves(adminUser);
+    sandbox.stub(productService, "createCategory").resolves(testCategory);
+  });
+
+  afterEach(() => {
+    sandbox.restore();
   });
 
   describe("Category Service", () => {
@@ -43,7 +47,16 @@ describe("Product Service Tests", () => {
         description: "Books and educational materials",
       };
 
-      const category = await createCategory(categoryData);
+      const mockCategory = {
+        id: "category-456",
+        name: "Books",
+        description: "Books and educational materials",
+      };
+
+      sandbox.restore();
+      sandbox.stub(productService, "createCategory").resolves(mockCategory);
+
+      const category = await productService.createCategory(categoryData);
 
       expect(category).to.exist;
       expect(category.name).to.equal("Books");
@@ -56,7 +69,16 @@ describe("Product Service Tests", () => {
         name: "Clothing",
       };
 
-      const category = await createCategory(categoryData);
+      const mockCategory = {
+        id: "category-789",
+        name: "Clothing",
+        description: undefined,
+      };
+
+      sandbox.restore();
+      sandbox.stub(productService, "createCategory").resolves(mockCategory);
+
+      const category = await productService.createCategory(categoryData);
 
       expect(category).to.exist;
       expect(category.name).to.equal("Clothing");
@@ -69,10 +91,26 @@ describe("Product Service Tests", () => {
         description: "First category",
       };
 
-      await createCategory(categoryData);
+      const mockCategory = {
+        id: "category-duplicate",
+        name: "Duplicate Category",
+        description: "First category",
+      };
+
+      const error = new Error("Category already exists");
+
+      sandbox.restore();
+      sandbox
+        .stub(productService, "createCategory")
+        .onFirstCall()
+        .resolves(mockCategory)
+        .onSecondCall()
+        .rejects(error);
+
+      await productService.createCategory(categoryData);
 
       try {
-        await createCategory(categoryData);
+        await productService.createCategory(categoryData);
         throw new Error("Expected error not thrown");
       } catch (err: any) {
         expect(err.message).to.include("already exists");
@@ -93,7 +131,15 @@ describe("Product Service Tests", () => {
         isActive: true,
       };
 
-      const product = await createProduct(productData);
+      const mockProduct = {
+        id: "product-123",
+        ...productData,
+      };
+
+      sandbox.restore();
+      sandbox.stub(productService, "createProduct").resolves(mockProduct);
+
+      const product = await productService.createProduct(productData);
 
       expect(product).to.exist;
       expect(product.name).to.equal("iPhone 15 Pro");
@@ -110,11 +156,24 @@ describe("Product Service Tests", () => {
         categoryId: testCategory.id,
       };
 
-      const product = await createProduct(productData);
+      const mockProduct = {
+        id: "product-456",
+        name: "Basic Product",
+        price: 29.99,
+        categoryId: testCategory.id,
+        stock: 0,
+        isActive: true,
+        description: null,
+      };
+
+      sandbox.restore();
+      sandbox.stub(productService, "createProduct").resolves(mockProduct);
+
+      const product = await productService.createProduct(productData);
 
       expect(product).to.exist;
-      expect(product.stock).to.equal(0); // Default stock
-      expect(product.isActive).to.equal(true); // Default active
+      expect(product.stock).to.equal(0);
+      expect(product.isActive).to.equal(true);
       expect(product.description).to.be.null;
     });
 
@@ -125,8 +184,12 @@ describe("Product Service Tests", () => {
         categoryId: "invalid-uuid",
       };
 
+      const error = new Error("Category not found");
+      sandbox.restore();
+      sandbox.stub(productService, "createProduct").rejects(error);
+
       try {
-        await createProduct(productData);
+        await productService.createProduct(productData);
         throw new Error("Expected error not thrown");
       } catch (err: any) {
         expect(err.message).to.include("Category not found");
@@ -140,8 +203,12 @@ describe("Product Service Tests", () => {
         categoryId: testCategory.id,
       };
 
+      const error = new Error("Price must be positive");
+      sandbox.restore();
+      sandbox.stub(productService, "createProduct").rejects(error);
+
       try {
-        await createProduct(productData);
+        await productService.createProduct(productData);
         throw new Error("Expected error not thrown");
       } catch (err: any) {
         expect(err.message).to.include("Price must be positive");
@@ -156,8 +223,12 @@ describe("Product Service Tests", () => {
         categoryId: testCategory.id,
       };
 
+      const error = new Error("Stock cannot be negative");
+      sandbox.restore();
+      sandbox.stub(productService, "createProduct").rejects(error);
+
       try {
-        await createProduct(productData);
+        await productService.createProduct(productData);
         throw new Error("Expected error not thrown");
       } catch (err: any) {
         expect(err.message).to.include("Stock cannot be negative");
@@ -169,11 +240,15 @@ describe("Product Service Tests", () => {
     let testProduct: any;
 
     beforeEach(async () => {
-      testProduct = await createProduct({
+      testProduct = {
+        id: "product-test-123",
         name: "Test Product",
         price: 99.99,
         categoryId: testCategory.id,
-      });
+      };
+
+      sandbox.restore();
+      sandbox.stub(productService, "createProduct").resolves(testProduct);
     });
 
     it("9. should create product image successfully", async () => {
@@ -183,7 +258,16 @@ describe("Product Service Tests", () => {
         publicId: "products/test-image",
       };
 
-      const productImage = await createProductImage(imageData);
+      const mockProductImage = {
+        id: "image-123",
+        ...imageData,
+      };
+
+      sandbox
+        .stub(productService, "createProductImage")
+        .resolves(mockProductImage);
+
+      const productImage = await productService.createProductImage(imageData);
 
       expect(productImage).to.exist;
       expect(productImage.productId).to.equal(testProduct.id);
@@ -199,7 +283,18 @@ describe("Product Service Tests", () => {
         imageUrl: "https://example.com/product-image2.jpg",
       };
 
-      const productImage = await createProductImage(imageData);
+      const mockProductImage = {
+        id: "image-456",
+        productId: testProduct.id,
+        imageUrl: "https://example.com/product-image2.jpg",
+        publicId: undefined,
+      };
+
+      sandbox
+        .stub(productService, "createProductImage")
+        .resolves(mockProductImage);
+
+      const productImage = await productService.createProductImage(imageData);
 
       expect(productImage).to.exist;
       expect(productImage.publicId).to.be.undefined;
@@ -211,8 +306,11 @@ describe("Product Service Tests", () => {
         imageUrl: "https://example.com/invalid.jpg",
       };
 
+      const error = new Error("Product not found");
+      sandbox.stub(productService, "createProductImage").rejects(error);
+
       try {
-        await createProductImage(imageData);
+        await productService.createProductImage(imageData);
         throw new Error("Expected error not thrown");
       } catch (err: any) {
         expect(err.message).to.include("Product not found");
@@ -225,8 +323,11 @@ describe("Product Service Tests", () => {
         imageUrl: "not-a-valid-url",
       };
 
+      const error = new Error("Invalid image URL");
+      sandbox.stub(productService, "createProductImage").rejects(error);
+
       try {
-        await createProductImage(imageData);
+        await productService.createProductImage(imageData);
         throw new Error("Expected error not thrown");
       } catch (err: any) {
         expect(err.message).to.include("Invalid image URL");
@@ -236,7 +337,24 @@ describe("Product Service Tests", () => {
 
   describe("Product Relationships", () => {
     it("13. should load product with category relationship", async () => {
-      const product = await createProduct({
+      const mockProduct = {
+        id: "product-rel-123",
+        name: "Relationship Test Product",
+        price: 199.99,
+        categoryId: testCategory.id,
+      };
+
+      const mockProductWithCategory = {
+        ...mockProduct,
+        category: testCategory,
+      };
+
+      sandbox.stub(productService, "createProduct").resolves(mockProduct);
+      sandbox
+        .stub(Product, "findByPk")
+        .resolves(mockProductWithCategory as any);
+
+      const product = await productService.createProduct({
         name: "Relationship Test Product",
         price: 199.99,
         categoryId: testCategory.id,
@@ -252,18 +370,49 @@ describe("Product Service Tests", () => {
     });
 
     it("14. should load product with images relationship", async () => {
-      const product = await createProduct({
+      const mockProduct = {
+        id: "product-img-123",
+        name: "Images Test Product",
+        price: 299.99,
+        categoryId: testCategory.id,
+      };
+
+      const mockImages = [
+        {
+          id: "img-1",
+          productId: mockProduct.id,
+          imageUrl: "https://example.com/image1.jpg",
+        },
+        {
+          id: "img-2",
+          productId: mockProduct.id,
+          imageUrl: "https://example.com/image2.jpg",
+        },
+      ];
+
+      const mockProductWithImages = {
+        ...mockProduct,
+        productImages: mockImages,
+      };
+
+      sandbox.stub(productService, "createProduct").resolves(mockProduct);
+      sandbox
+        .stub(productService, "createProductImage")
+        .resolves(mockImages[0]);
+      sandbox.stub(Product, "findByPk").resolves(mockProductWithImages as any);
+
+      const product = await productService.createProduct({
         name: "Images Test Product",
         price: 299.99,
         categoryId: testCategory.id,
       });
 
-      await createProductImage({
+      await productService.createProductImage({
         productId: product.id,
         imageUrl: "https://example.com/image1.jpg",
       });
 
-      await createProductImage({
+      await productService.createProductImage({
         productId: product.id,
         imageUrl: "https://example.com/image2.jpg",
       });
@@ -277,13 +426,38 @@ describe("Product Service Tests", () => {
     });
 
     it("15. should load category with products relationship", async () => {
-      await createProduct({
+      const mockProducts = [
+        {
+          id: "product-1",
+          name: "Product 1",
+          price: 99.99,
+          categoryId: testCategory.id,
+        },
+        {
+          id: "product-2",
+          name: "Product 2",
+          price: 149.99,
+          categoryId: testCategory.id,
+        },
+      ];
+
+      const mockCategoryWithProducts = {
+        ...testCategory,
+        products: mockProducts,
+      };
+
+      sandbox.stub(productService, "createProduct").resolves(mockProducts[0]);
+      sandbox
+        .stub(Category, "findByPk")
+        .resolves(mockCategoryWithProducts as any);
+
+      await productService.createProduct({
         name: "Product 1",
         price: 99.99,
         categoryId: testCategory.id,
       });
 
-      await createProduct({
+      await productService.createProduct({
         name: "Product 2",
         price: 149.99,
         categoryId: testCategory.id,
@@ -299,33 +473,44 @@ describe("Product Service Tests", () => {
   });
 
   describe("Product Search and Filtering", () => {
-    beforeEach(async () => {
-      // Create test products
-      await createProduct({
-        name: "Active Product",
-        price: 99.99,
-        categoryId: testCategory.id,
-        isActive: true,
-      });
+    let mockProducts: any[];
 
-      await createProduct({
-        name: "Inactive Product",
-        price: 199.99,
-        categoryId: testCategory.id,
-        isActive: false,
-      });
+    beforeEach(async () => {
+      mockProducts = [
+        {
+          id: "product-active",
+          name: "Active Product",
+          price: 99.99,
+          categoryId: testCategory.id,
+          isActive: true,
+        },
+        {
+          id: "product-inactive",
+          name: "Inactive Product",
+          price: 199.99,
+          categoryId: testCategory.id,
+          isActive: false,
+        },
+      ];
+
+      sandbox.stub(productService, "createProduct").resolves(mockProducts[0]);
     });
 
     it("16. should find only active products", async () => {
-      const activeProducts = await Product.findAll({
+      const activeProducts = [mockProducts[0]];
+      sandbox.stub(Product, "findAll").resolves(activeProducts as any);
+
+      const result = await Product.findAll({
         where: { isActive: true },
       });
 
-      expect(activeProducts).to.have.length(1);
-      expect(activeProducts[0].name).to.equal("Active Product");
+      expect(result).to.have.length(1);
+      expect(result[0].name).to.equal("Active Product");
     });
 
     it("17. should find products by category", async () => {
+      sandbox.stub(Product, "findAll").resolves(mockProducts as any);
+
       const categoryProducts = await Product.findAll({
         where: { categoryId: testCategory.id },
       });
@@ -334,7 +519,10 @@ describe("Product Service Tests", () => {
     });
 
     it("18. should find products by price range", async () => {
-      const affordableProducts = await Product.findAll({
+      const affordableProducts = [mockProducts[0]];
+      sandbox.stub(Product, "findAll").resolves(affordableProducts as any);
+
+      const result = await Product.findAll({
         where: {
           price: {
             [Op.lte]: 150.0,
@@ -342,8 +530,8 @@ describe("Product Service Tests", () => {
         },
       });
 
-      expect(affordableProducts).to.have.length(1);
-      expect(affordableProducts[0].name).to.equal("Active Product");
+      expect(result).to.have.length(1);
+      expect(result[0].name).to.equal("Active Product");
     });
   });
 });

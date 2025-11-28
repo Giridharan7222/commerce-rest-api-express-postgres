@@ -36,6 +36,20 @@ export const createUserSchema: Schema = {
 };
 
 export const createCustomerProfileSchema: Schema = {
+  firstName: {
+    in: "body",
+    optional: true,
+    isString: {
+      errorMessage: "First name must be a string",
+    },
+  },
+  lastName: {
+    in: "body",
+    optional: true,
+    isString: {
+      errorMessage: "Last name must be a string",
+    },
+  },
   full_name: {
     in: "body",
     optional: true,
@@ -48,6 +62,20 @@ export const createCustomerProfileSchema: Schema = {
     optional: true,
     isString: {
       errorMessage: "Phone must be a string",
+    },
+  },
+  dateOfBirth: {
+    in: "body",
+    optional: true,
+    isISO8601: {
+      errorMessage: "Date of birth must be a valid date",
+    },
+  },
+  dob: {
+    in: "body",
+    optional: true,
+    isISO8601: {
+      errorMessage: "Date of birth must be a valid date",
     },
   },
   gender: {
@@ -177,11 +205,24 @@ export const createAdminPayload = (req: Request): CreateUserDto => {
 export const createCustomerProfilePayload = (
   req: Request,
 ): CreateCustomerProfileDto => {
+  const user = (req as any).user;
+
+  if (!user || !user.id) {
+    throw new Error("User not authenticated or user ID missing from token");
+  }
+
   return {
-    user_id: req.body.user_id,
-    full_name: req.body.full_name,
+    user_id: user.id,
+    full_name:
+      req.body.firstName && req.body.lastName
+        ? `${req.body.firstName} ${req.body.lastName}`
+        : req.body.full_name,
     phone: req.body.phone,
-    dob: req.body.dob ? new Date(req.body.dob) : undefined,
+    dob: req.body.dateOfBirth
+      ? new Date(req.body.dateOfBirth)
+      : req.body.dob
+        ? new Date(req.body.dob)
+        : undefined,
     gender: req.body.gender,
     profile_image_url: req.body.profile_image_url,
   };
@@ -239,8 +280,9 @@ export const loginSchema: Schema = {
 };
 
 export const createAddressPayload = (req: Request): CreateAddressDto => {
+  const user = (req as any).user;
   return {
-    user_id: req.body.user_id,
+    user_id: user?.id,
     full_name: req.body.full_name,
     phone: req.body.phone,
     address_line1: req.body.address_line1,

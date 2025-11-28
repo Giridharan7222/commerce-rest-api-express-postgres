@@ -8,7 +8,33 @@ const options = {
     info: {
       title: "Commerce API",
       version: "1.0.0",
-      description: "E-commerce REST API with Express and PostgreSQL",
+      description: `E-commerce REST API with Express and PostgreSQL
+
+## Customer Order Flow:
+1. **Account**: POST /api/signup OR POST /api/login
+2. **Profile**: POST /api/users/profile (new customers)
+3. **Address**: POST /api/users/addresses (new customers)
+4. **Browse**: GET /api/categories → GET /api/products
+5. **Cart**: POST /api/cart (add products)
+6. **Stripe**: POST /api/stripe/customers
+7. **Order**: POST /api/orders
+8. **Payment**: POST /api/stripe/process-payment
+
+**Test Account**: giri.customer@commerce.com / password
+
+## Admin Management Flow:
+1. **Login**: POST /api/login (giri.admin@commerce.com / password)
+2. **Create Admin**: POST /api/users/create-admin (admin only)
+3. **Categories**: POST /api/categories (create/manage)
+4. **Products**: POST /api/products OR POST /api/products/upload
+5. **Product Images**: POST /api/product-images (manage images)
+6. **System Health**: GET/POST /api/system-health (monitor)
+
+**Test Admin**: giri.admin@commerce.com / password
+
+**Note**: Additional APIs available for user management, order management, payment methods, and more. See individual endpoint documentation below.
+
+📖 **For detailed documentation, visit**: [GitHub README](https://github.com/your-repo/commerce-rest-api-express-postgres/blob/main/Backend/README.md)`,
     },
     servers: [
       {

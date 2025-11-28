@@ -45,8 +45,34 @@ export async function createAdmin(dto: CreateUserDto) {
 }
 
 export async function createCustomerProfile(dto: CreateCustomerProfileDto) {
+  // Check if profile already exists
+  const existingProfile = await CustomerProfile.findOne({
+    where: { user_id: dto.user_id },
+  });
+  if (existingProfile) {
+    throw new Error("Profile already exists for this user");
+  }
+
   const profile = await CustomerProfile.create(dto as any);
   return profile.get({ plain: true });
+}
+
+export async function createOrUpdateCustomerProfile(
+  dto: CreateCustomerProfileDto,
+) {
+  const existingProfile = await CustomerProfile.findOne({
+    where: { user_id: dto.user_id },
+  });
+
+  if (existingProfile) {
+    // Update existing profile
+    await existingProfile.update(dto);
+    return existingProfile.get({ plain: true });
+  } else {
+    // Create new profile
+    const profile = await CustomerProfile.create(dto as any);
+    return profile.get({ plain: true });
+  }
 }
 
 export async function createAdminProfile(dto: CreateAdminProfileDto) {
