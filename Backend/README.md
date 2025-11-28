@@ -1,55 +1,51 @@
-# Giri Backend API
+# Backend API
 
-A Node.js/TypeScript API with PostgreSQL database integration.
+A RESTful API backend for a commerce application built with Node.js, TypeScript, and PostgreSQL.
 
-## Project Structure
+## Prerequisites
 
-```
-Backend/
-├── src/
-│   ├── controllers/     # Request handlers
-│   ├── database/        # Database connection
-│   ├── dtos/           # Data transfer objects
-│   ├── models/         # Database models
-│   ├── routes/         # API routes
-│   ├── services/       # Business logic
-│   ├── tests/          # Test files
-│   ├── validators/     # Input validation
-│   └── server.ts       # Application entry point
-├── dist/               # Build output
-├── package.json
-├── tsconfig.json
-└── README.md
-```
+- **Node.js** (v16 or higher)
+- **Yarn** package manager
+- **PostgreSQL** database
+- **Docker** (optional, for containerized setup)
 
-## Scripts
+## Tech Stack
 
-- `yarn dev` - Start development server with hot reload
-- `yarn start` - Start production server
-- `yarn build` - Build TypeScript to JavaScript
-- `yarn test` - Run test suite
-- `yarn format` - Format code with Prettier
-- `yarn format:check` - Check code formatting
-- `yarn db:start` - Start database services
-- `yarn db:stop` - Stop database services
+### Runtime & Language
+- **Node.js** - JavaScript runtime environment
+- **TypeScript** - Type-safe JavaScript superset
 
-## Development
+### Framework & Libraries
+- **Express.js** - Web application framework
+- **PostgreSQL** - Relational database
+- **Sequelize** - PostgreSQL ORM with TypeScript support
+- **JWT** - Authentication and authorization
+- **Bcrypt** - Password hashing
+- **Swagger** - API documentation
+- **Stripe** - Payment processing
+- **Cloudinary** - Image and file management
 
-1. Start database: `yarn db:start`
-2. Start API: `yarn dev`
-3. API runs on: http://localhost:5005
+### Development Tools
+- **Yarn** - Package manager
+- **Prettier** - Code formatter
+- **Jest & Mocha** - Testing frameworks
+- **Docker** - Containerization
+- **Flyway** - Database migration tool
+- **Nodemon** - Development server with hot reload
+- **ESLint** - Code linting
 
-## API Endpoints
+### Architecture
+- **RESTful API** design
+- **MVC Pattern** with controllers, services, and models
+- **DTO Pattern** for data validation
+- **TypeScript** for type safety
+- **Middleware** for authentication, validation, and security
+- **Rate limiting** and security headers
+- **File upload** handling with Multer
 
-- `POST /api/users` - Create new user
-- `GET /health` - Health check
+## Additional Information
 
-## Testing
-
-```bash
-# Run all tests
-yarn test
-
-# Format code
-yarn format
-```
+For detailed setup, configuration, and usage instructions:
+- **Database setup & configuration**: See `../DB/README.md`
+- **Backend API setup & development**: See this `Backend/` folder documentation
+- **Database schema & migrations**: See `../DB/readme/DATABASE_SCHEMA.md`
