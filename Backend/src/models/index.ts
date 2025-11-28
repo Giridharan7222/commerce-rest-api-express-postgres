@@ -14,3 +14,5 @@ export { default as PaymentTransaction } from "./paymentTransaction";
 export { default as PaymentMethod } from "./paymentMethod";
 export { default as StripeCustomer } from "./stripeCustomer";
 export { default as Refund } from "./refund";
+export { default as AdminActivityLog } from "./adminActivityLog";
+export { default as ApiLog } from "./apiLog";

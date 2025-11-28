@@ -19,7 +19,17 @@ import {
   getFilteredProducts,
 } from "../services/product";
 
-export const createCategoryController = async (req: Request, res: Response) => {
+interface AdminRequest extends Request {
+  user?: {
+    id: string;
+    role: string;
+  };
+}
+
+export const createCategoryController = async (
+  req: AdminRequest,
+  res: Response,
+) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return (res as any).fail(
@@ -31,7 +41,8 @@ export const createCategoryController = async (req: Request, res: Response) => {
   }
 
   try {
-    const category = await createCategory(req.body);
+    const adminId = req.user?.role === "admin" ? req.user.id : undefined;
+    const category = await createCategory(req.body, adminId);
     return (res as any).success("Category created successfully", category, 201);
   } catch (error) {
     return (res as any).fail(
@@ -83,7 +94,10 @@ export const getCategoryController = async (req: Request, res: Response) => {
   }
 };
 
-export const updateCategoryController = async (req: Request, res: Response) => {
+export const updateCategoryController = async (
+  req: AdminRequest,
+  res: Response,
+) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return (res as any).fail(
@@ -96,7 +110,8 @@ export const updateCategoryController = async (req: Request, res: Response) => {
 
   try {
     const categoryId = req.params.id;
-    const category = await updateCategory(categoryId, req.body);
+    const adminId = req.user?.role === "admin" ? req.user.id : undefined;
+    const category = await updateCategory(categoryId, req.body, adminId);
     return (res as any).success("Category updated successfully", category, 200);
   } catch (error) {
     return (res as any).fail(
@@ -108,10 +123,14 @@ export const updateCategoryController = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteCategoryController = async (req: Request, res: Response) => {
+export const deleteCategoryController = async (
+  req: AdminRequest,
+  res: Response,
+) => {
   try {
     const categoryId = req.params.id;
-    const result = await deleteCategory(categoryId);
+    const adminId = req.user?.role === "admin" ? req.user.id : undefined;
+    const result = await deleteCategory(categoryId, adminId);
     return (res as any).success("Category deleted successfully", result, 200);
   } catch (error) {
     return (res as any).fail(
@@ -358,13 +377,23 @@ export const getFilteredProductsController = async (
   res: Response,
 ) => {
   try {
-    const hasFilters = req.query.search || req.query.categoryId || req.query.minPrice || req.query.maxPrice || req.query.page || req.query.limit;
-    
+    const hasFilters =
+      req.query.search ||
+      req.query.categoryId ||
+      req.query.minPrice ||
+      req.query.maxPrice ||
+      req.query.page ||
+      req.query.limit;
+
     if (!hasFilters) {
       const products = await getAllProducts();
-      return (res as any).success("Products retrieved successfully", products, 200);
+      return (res as any).success(
+        "Products retrieved successfully",
+        products,
+        200,
+      );
     }
-    
+
     const filters = {
       search: req.query.search as string,
       categoryId: req.query.categoryId as string,
@@ -373,7 +402,7 @@ export const getFilteredProductsController = async (
       page: req.query.page ? Number(req.query.page) : 1,
       limit: req.query.limit ? Number(req.query.limit) : 10,
     };
-    
+
     const result = await getFilteredProducts(filters);
     return (res as any).success("Products retrieved successfully", result, 200);
   } catch (error) {

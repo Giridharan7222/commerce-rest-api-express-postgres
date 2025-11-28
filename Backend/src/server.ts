@@ -1,4 +1,8 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+import path from "path";
+
+// Load environment variables from config/env folder
+dotenv.config({ path: path.join(__dirname, "../config/env/.env") });
 import app from "./app";
 import sequelize from "./database/connection";
 

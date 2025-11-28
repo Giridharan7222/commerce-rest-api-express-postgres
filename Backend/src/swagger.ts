@@ -12,7 +12,7 @@ const options = {
     },
     servers: [
       {
-        url: "http://localhost:5005",
+        url: process.env.API_BASE_URL || "http://localhost:5005",
         description: "Development server",
       },
     ],
@@ -115,7 +115,10 @@ const options = {
           type: "object",
           properties: {
             success: { type: "boolean", example: true },
-            message: { type: "string", example: "Operation completed successfully" },
+            message: {
+              type: "string",
+              example: "Operation completed successfully",
+            },
             data: { type: "object" },
           },
         },

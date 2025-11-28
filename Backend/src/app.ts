@@ -8,6 +8,7 @@ import { limiter } from "./middleware/limiter";
 import { errorHandler404 } from "./middleware/errorHandler404";
 import { errorHandler } from "./middleware/errorHandler";
 import { responseHandler } from "./middleware/responseHandler";
+import { apiLogger } from "./middleware/apiLogger";
 import { setupSwagger } from "./swagger";
 
 const app = express();
@@ -17,6 +18,7 @@ app.use(cors(corsOptionsDelegate));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true })); // to handle form-urlencoded data
 app.use(responseHandler as express.RequestHandler);
+app.use(apiLogger);
 app.use(log);
 app.use(helmet());
 app.use(limiter);

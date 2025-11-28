@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { validationResult } from "express-validator";
 import { OrderService } from "../services/order";
 import { OrderStatus } from "../enums/order";
@@ -6,17 +6,7 @@ import {
   createOrderPayload,
   updateOrderStatusPayload,
 } from "../validators/order";
-import { UserRole } from "../enums/user";
-
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: UserRole;
-    profile?: any;
-    addresses?: any[];
-  };
-}
+import { AuthRequest } from "../interfaces/auth";
 
 export class OrderController {
   static async createOrder(req: AuthRequest, res: Response) {

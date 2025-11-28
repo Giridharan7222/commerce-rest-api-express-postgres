@@ -52,9 +52,9 @@ paths:
       tags: [Products]
       description: |
         Retrieve products with optional filtering and pagination.
-        
+
         **Without query parameters**: Returns all products (original behavior)
-        
+
         **With query parameters**: Returns filtered and paginated results with pagination metadata
       parameters:
         - in: query

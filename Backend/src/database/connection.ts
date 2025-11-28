@@ -15,6 +15,8 @@ import PaymentTransaction from "../models/paymentTransaction";
 import PaymentMethod from "../models/paymentMethod";
 import StripeCustomer from "../models/stripeCustomer";
 import Refund from "../models/refund";
+import AdminActivityLog from "../models/adminActivityLog";
+import ApiLog from "../models/apiLog";
 
 const sequelize = new Sequelize({
   host: process.env.POSTGRES_HOST_NONCONTAINER,
@@ -40,6 +42,8 @@ const sequelize = new Sequelize({
     PaymentMethod,
     StripeCustomer,
     Refund,
+    AdminActivityLog,
+    ApiLog,
   ],
   logging: false,
 });

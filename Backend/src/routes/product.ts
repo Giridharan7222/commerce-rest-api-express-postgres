@@ -41,7 +41,11 @@ router.post(
   ]),
   createProductWithFilesController,
 );
-router.get("/products", productFiltersValidation, getFilteredProductsController);
+router.get(
+  "/products",
+  productFiltersValidation,
+  getFilteredProductsController,
+);
 router.get("/products/:id", getProductController);
 router.put(
   "/products/:id",

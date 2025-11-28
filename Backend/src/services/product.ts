@@ -13,8 +13,9 @@ import Product from "../models/product";
 import ProductImage from "../models/productImage";
 import { uploadFile } from "../utils/cloudinary";
 import { Op } from "sequelize";
+import { AdminLogger } from "../utils/adminLogger";
 
-export async function createCategory(dto: CreateCategoryDto) {
+export async function createCategory(dto: CreateCategoryDto, adminId?: string) {
   // Check for duplicate category name
   const existingCategory = await Category.findOne({
     where: { name: dto.name },
@@ -24,7 +25,19 @@ export async function createCategory(dto: CreateCategoryDto) {
   }
 
   const category = await Category.create(dto as any);
-  return category.get({ plain: true });
+  const categoryData = category.get({ plain: true });
+
+  // Log admin activity
+  if (adminId) {
+    await AdminLogger.logCreate(
+      adminId,
+      "categories",
+      category.id,
+      categoryData,
+    );
+  }
+
+  return categoryData;
 }
 
 export async function getAllCategories() {
@@ -49,6 +62,7 @@ export async function getCategoryById(categoryId: string) {
 export async function updateCategory(
   categoryId: string,
   dto: UpdateCategoryDto,
+  adminId?: string,
 ) {
   const category = await Category.findByPk(categoryId);
 
@@ -56,18 +70,44 @@ export async function updateCategory(
     throw new Error("Category not found");
   }
 
+  const beforeData = category.get({ plain: true });
   await category.update(dto);
-  return category.get({ plain: true });
+  const afterData = category.get({ plain: true });
+
+  // Log admin activity
+  if (adminId) {
+    await AdminLogger.logUpdate(
+      adminId,
+      "categories",
+      categoryId,
+      beforeData,
+      afterData,
+    );
+  }
+
+  return afterData;
 }
 
-export async function deleteCategory(categoryId: string) {
+export async function deleteCategory(categoryId: string, adminId?: string) {
   const category = await Category.findByPk(categoryId);
 
   if (!category) {
     throw new Error("Category not found");
   }
 
+  const categoryData = category.get({ plain: true });
   await category.destroy();
+
+  // Log admin activity
+  if (adminId) {
+    await AdminLogger.logDelete(
+      adminId,
+      "categories",
+      categoryId,
+      categoryData,
+    );
+  }
+
   return { message: "Category deleted successfully" };
 }
 
@@ -244,19 +284,28 @@ export async function deleteProductImage(imageId: string) {
   return { message: "Product image deleted successfully" };
 }
 
-export async function getFilteredProducts(filters: ProductFiltersDto): Promise<ProductListResponseDto> {
-  const { search, categoryId, minPrice, maxPrice, page = 1, limit = 10 } = filters;
-  
+export async function getFilteredProducts(
+  filters: ProductFiltersDto,
+): Promise<ProductListResponseDto> {
+  const {
+    search,
+    categoryId,
+    minPrice,
+    maxPrice,
+    page = 1,
+    limit = 10,
+  } = filters;
+
   const whereClause: any = { isActive: true };
-  
+
   if (search) {
     whereClause.name = { [Op.iLike]: `%${search}%` };
   }
-  
+
   if (categoryId) {
     whereClause.categoryId = categoryId;
   }
-  
+
   if (minPrice !== undefined || maxPrice !== undefined) {
     whereClause.price = {};
     if (minPrice !== undefined) {
@@ -266,9 +315,9 @@ export async function getFilteredProducts(filters: ProductFiltersDto): Promise<P
       whereClause.price[Op.lte] = maxPrice;
     }
   }
-  
+
   const offset = (page - 1) * limit;
-  
+
   const { count, rows } = await Product.findAndCountAll({
     where: whereClause,
     include: [
@@ -279,9 +328,9 @@ export async function getFilteredProducts(filters: ProductFiltersDto): Promise<P
     limit,
     offset,
   });
-  
+
   const products = rows.map((product: any) => product.get({ plain: true }));
-  
+
   return {
     products,
     pagination: {

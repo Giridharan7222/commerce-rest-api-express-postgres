@@ -1,18 +1,8 @@
-import { Request, Response, NextFunction } from "express";
+import { Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { User, CustomerProfile, AdminProfile, Address } from "../models";
-
 import { UserRole } from "../enums/user";
-
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: UserRole;
-    profile?: any;
-    addresses?: any[];
-  };
-}
+import { AuthRequest } from "../interfaces/auth";
 
 export const authenticateToken = async (
   req: AuthRequest,

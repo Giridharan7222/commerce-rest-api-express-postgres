@@ -1,17 +1,8 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { validationResult } from "express-validator";
 import { CartService } from "../services/cart";
 import { addToCartPayload, updateCartItemPayload } from "../validators/cart";
-
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-    profile?: any;
-    addresses?: any[];
-  };
-}
+import { AuthRequest } from "../interfaces/auth";
 
 export class CartController {
   static async addToCart(req: AuthRequest, res: Response) {

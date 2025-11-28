@@ -12,17 +12,7 @@ import {
   processPaymentPayload,
   createPaymentIntentPayload,
 } from "../validators/payment";
-import { UserRole } from "../enums/user";
-
-interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: UserRole;
-    profile?: any;
-    addresses?: any[];
-  };
-}
+import { AuthRequest } from "../interfaces/auth";
 
 export class StripeController {
   // Create customer
