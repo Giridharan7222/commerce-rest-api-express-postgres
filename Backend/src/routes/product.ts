@@ -1,10 +1,5 @@
 import { Router } from "express";
 import {
-  createCategoryController,
-  getAllCategoriesController,
-  getCategoryController,
-  updateCategoryController,
-  deleteCategoryController,
   createProductController,
   createProductWithFilesController,
   getProductController,
@@ -17,8 +12,6 @@ import {
   getFilteredProductsController,
 } from "../controllers/product";
 import {
-  createCategoryValidation,
-  updateCategoryValidation,
   createProductValidation,
   updateProductValidation,
   createProductImageValidation,
@@ -30,29 +23,6 @@ import { authenticateToken, requireRole } from "../middleware/auth";
 import { UserRole } from "../enums/user";
 
 const router = Router();
-
-router.post(
-  "/categories",
-  authenticateToken,
-  requireRole([UserRole.ADMIN]),
-  createCategoryValidation,
-  createCategoryController,
-);
-router.get("/categories", getAllCategoriesController);
-router.get("/categories/:id", getCategoryController);
-router.put(
-  "/categories/:id",
-  authenticateToken,
-  requireRole([UserRole.ADMIN]),
-  updateCategoryValidation,
-  updateCategoryController,
-);
-router.delete(
-  "/categories/:id",
-  authenticateToken,
-  requireRole([UserRole.ADMIN]),
-  deleteCategoryController,
-);
 
 router.post(
   "/products",

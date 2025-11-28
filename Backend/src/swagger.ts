@@ -111,6 +111,39 @@ const options = {
             },
           },
         },
+        SuccessResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: true },
+            message: { type: "string", example: "Operation completed successfully" },
+            data: { type: "object" },
+          },
+        },
+        ErrorResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: false },
+            message: { type: "string", example: "An error occurred" },
+            error: { type: "string" },
+          },
+        },
+        ValidationErrorResponse: {
+          type: "object",
+          properties: {
+            success: { type: "boolean", example: false },
+            message: { type: "string", example: "Validation failed" },
+            errors: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  field: { type: "string" },
+                  message: { type: "string" },
+                },
+              },
+            },
+          },
+        },
       },
     },
   },
@@ -119,6 +152,7 @@ const options = {
     "./src/docs/swagger/user.swagger.yaml",
     "./src/docs/swagger/profile.swagger.yaml",
     "./src/docs/swagger/address.swagger.yaml",
+    "./src/docs/swagger/category.swagger.yaml",
     "./src/docs/swagger/product.swagger.yaml",
     "./src/docs/swagger/cart.swagger.yaml",
     "./src/docs/swagger/order.swagger.yaml",
