@@ -64,6 +64,7 @@ Backend/
    ./env/local/_up.sh
    cd ../Backend
    ```
+   > **For detailed database setup**: [DB README](https://github.com/Giridharan7222/commerce-rest-api-express-postgres/blob/main/DB/README.md)
 
 3. **Environment configuration:**
    ```bash
@@ -329,6 +330,7 @@ LOG_FILE=logs/app.log
 ## Additional Information
 
 For more details:
-- **Database setup**: See `../DB/README.md`
+- **Database setup**: [DB README](https://github.com/Giridharan7222/commerce-rest-api-express-postgres/blob/main/DB/README.md)
 - **Database schema**: See `../DB/readme/DATABASE_SCHEMA.md`
+- **API flows**: [FLOW.md](./FLOW.md)
 - **Tech stack overview**: See main project README

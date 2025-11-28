@@ -34,7 +34,9 @@ const options = {
 
 **Note**: Additional APIs available for user management, order management, payment methods, and more. See individual endpoint documentation below.
 
-📖 **For detailed documentation, visit**: [GitHub README](https://github.com/your-repo/commerce-rest-api-express-postgres/blob/main/Backend/README.md)`,
+📖 **For detailed documentation, visit**: [GitHub README](https://github.com/Giridharan7222/commerce-rest-api-express-postgres/blob/main/Backend/README.md)
+📋 **For step-by-step API flows, visit**: [API Flow Guide](https://github.com/Giridharan7222/commerce-rest-api-express-postgres/blob/main/Backend/FLOW.md)
+🗄️ **For database setup, visit**: [Database README](https://github.com/Giridharan7222/commerce-rest-api-express-postgres/blob/main/DB/README.md)`,
     },
     servers: [
       {
