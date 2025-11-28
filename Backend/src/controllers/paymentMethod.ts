@@ -7,6 +7,60 @@ import { StripeCustomerService } from "../services/stripeCustomer";
 import { AuthRequest } from "../interfaces/auth";
 
 export class PaymentMethodController {
+  static async createAndSavePaymentMethod(req: AuthRequest, res: Response) {
+    try {
+      if (handleValidationErrors(req, res)) return;
+
+      const userId = req.user?.id;
+      if (!userId) {
+        return (res as any).fail("Unauthorized", "UNAUTHORIZED", null, 401);
+      }
+
+      const { testToken, isDefault } = req.body;
+
+      // Get or create Stripe customer
+      const stripeCustomerId =
+        await StripeCustomerService.getOrCreateStripeCustomer(
+          userId,
+          undefined,
+          req.user?.email,
+          req.user?.profile,
+        );
+
+      // Attach test payment method to customer
+      const stripePaymentMethod = await StripeService.attachPaymentMethod(
+        testToken,
+        stripeCustomerId,
+      );
+
+      // Save to database
+      const paymentMethod = await PaymentMethod.create({
+        user_id: userId,
+        stripe_payment_method_id: stripePaymentMethod.id,
+        stripe_customer_id: stripeCustomerId,
+        type: stripePaymentMethod.type,
+        brand: stripePaymentMethod.card?.brand as any,
+        last4: stripePaymentMethod.card?.last4,
+        expiry_month: stripePaymentMethod.card?.exp_month,
+        expiry_year: stripePaymentMethod.card?.exp_year,
+        is_default: isDefault,
+      });
+
+      return (res as any).success(
+        "Payment method created and saved successfully",
+        paymentMethod,
+        201,
+      );
+    } catch (error: any) {
+      return (res as any).fail(
+        error.message,
+        "PAYMENT_METHOD_ERROR",
+        null,
+        400,
+      );
+    }
+  }
+
   static async savePaymentMethod(req: AuthRequest, res: Response) {
     try {
       if (handleValidationErrors(req, res)) return;

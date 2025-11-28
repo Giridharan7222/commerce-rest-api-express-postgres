@@ -8,5 +8,6 @@ export interface AuthRequest extends Request {
     role: UserRole;
     profile?: any;
     addresses?: any[];
+    stripeCustomerId?: string;
   };
 }

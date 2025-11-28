@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import sequelize from "../database/connection";
+import { testDatabase as sequelize } from "../config";
 import { User } from "../models";
 import Category from "../models/category";
 import Product from "../models/product";
@@ -60,7 +60,7 @@ describe("Product Service Tests", () => {
 
       expect(category).to.exist;
       expect(category.name).to.equal("Clothing");
-      expect(category.description).to.be.null;
+      expect(category.description).to.be.undefined;
     });
 
     it("3. should NOT allow duplicate category names", async () => {
@@ -202,7 +202,7 @@ describe("Product Service Tests", () => {
       const productImage = await createProductImage(imageData);
 
       expect(productImage).to.exist;
-      expect(productImage.publicId).to.be.null;
+      expect(productImage.publicId).to.be.undefined;
     });
 
     it("11. should NOT create product image with invalid product ID", async () => {

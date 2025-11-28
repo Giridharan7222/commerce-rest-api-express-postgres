@@ -118,6 +118,22 @@ export class OrderController {
     }
   }
 
+  static async completePayment(req: AuthRequest, res: Response) {
+    try {
+      const { orderId } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        return (res as any).fail("Unauthorized", "UNAUTHORIZED", null, 401);
+      }
+
+      const order = await OrderService.completePayment(orderId, userId);
+      return (res as any).success("Payment completed successfully", order, 200);
+    } catch (error: any) {
+      return (res as any).fail(error.message, "ORDER_ERROR", null, 400);
+    }
+  }
+
   static async updateOrderStatus(req: AuthRequest, res: Response) {
     try {
       if (handleValidationErrors(req, res)) return;

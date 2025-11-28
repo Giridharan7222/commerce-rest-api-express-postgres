@@ -90,6 +90,7 @@ export const updateOrderStatusSchema: Schema = {
 };
 
 export const createOrderPayload = (req: Request): CreateOrderDto => ({
+  //
   shippingAddress: req.body.shippingAddress,
   paymentMethod: req.body.paymentMethod,
 });

@@ -78,6 +78,25 @@ export const createPaymentIntentPayload = (req: Request) => ({
   paymentMethodId: req.body.paymentMethodId,
 });
 
+export const createPaymentMethodSchema: Schema = {
+  testToken: {
+    in: "body",
+    isString: {
+      errorMessage: "Test token must be a string",
+    },
+    notEmpty: {
+      errorMessage: "Test token is required",
+    },
+  },
+  isDefault: {
+    in: "body",
+    optional: true,
+    isBoolean: {
+      errorMessage: "isDefault must be a boolean",
+    },
+  },
+};
+
 export const savePaymentMethodPayload = (req: Request) => ({
   stripePaymentMethodId: req.body.stripePaymentMethodId,
   isDefault: req.body.isDefault || false,

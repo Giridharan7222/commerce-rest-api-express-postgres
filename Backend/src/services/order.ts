@@ -13,7 +13,7 @@ import { PaymentMethodType } from "../enums/payment";
 import { CartService } from "./cart";
 import { StripeCustomerService } from "./stripeCustomer";
 import StripeService from "./stripe";
-import sequelize from "../database/connection";
+import { database as sequelize } from "../config";
 import { Transaction } from "sequelize";
 
 export class OrderService {
@@ -252,7 +252,11 @@ export class OrderService {
     return await sequelize.transaction(async (transaction: Transaction) => {
       const order = await Order.findOne({
         where: { id: orderId, user_id: userId },
-        include: [{ model: OrderItem, as: "items" }],
+        include: [
+          { model: OrderItem, as: "items" },
+          { model: Invoice, as: "invoice" },
+          { model: PaymentTransaction, as: "transactions" },
+        ],
         transaction,
       });
 
@@ -277,8 +281,78 @@ export class OrderService {
         );
       }
 
+      // Cancel invoice
+      if ((order as any).invoice) {
+        await Invoice.update(
+          { status: InvoiceStatus.CANCELLED },
+          { where: { id: (order as any).invoice.id }, transaction },
+        );
+      }
+
+      // Cancel payment transactions
+      if ((order as any).transactions) {
+        await PaymentTransaction.update(
+          { status: "cancelled" },
+          { where: { order_id: orderId }, transaction },
+        );
+      }
+
+      // Update order status and payment status
       return await order.update(
-        { status: OrderStatus.CANCELLED },
+        {
+          status: OrderStatus.CANCELLED,
+          payment_status: PaymentStatus.CANCELLED,
+        },
+        { transaction },
+      );
+    });
+  }
+
+  static async completePayment(orderId: string, userId: string) {
+    return await sequelize.transaction(async (transaction: Transaction) => {
+      const order = await Order.findOne({
+        where: { id: orderId, user_id: userId },
+        include: [
+          { model: Invoice, as: "invoice" },
+          { model: PaymentTransaction, as: "transactions" },
+        ],
+        transaction,
+      });
+
+      if (!order) {
+        throw new Error("Order not found");
+      }
+
+      if (order.payment_status === PaymentStatus.PAID) {
+        throw new Error("Payment already completed");
+      }
+
+      if (order.status === OrderStatus.CANCELLED) {
+        throw new Error("Cannot complete payment for cancelled order");
+      }
+
+      // Update invoice status to paid
+      if ((order as any).invoice) {
+        await Invoice.update(
+          { status: InvoiceStatus.PAID, paid_at: new Date() },
+          { where: { id: (order as any).invoice.id }, transaction },
+        );
+      }
+
+      // Update payment transactions to completed
+      if ((order as any).transactions) {
+        await PaymentTransaction.update(
+          { status: "completed" },
+          { where: { order_id: orderId }, transaction },
+        );
+      }
+
+      // Update order payment status and move to processing
+      return await order.update(
+        {
+          payment_status: PaymentStatus.PAID,
+          status: OrderStatus.PROCESSING,
+        },
         { transaction },
       );
     });

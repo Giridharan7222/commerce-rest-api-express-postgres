@@ -8,12 +8,13 @@ import {
 } from "../controllers/user";
 import { createAdminSchema, updateUserSchema } from "../validators/user";
 import { authenticateToken, requireRole } from "../middleware/auth";
+import { UserRole } from "../enums/user";
 
 export const adminRoutes = express.Router();
 
 // All admin routes require authentication and admin role
 adminRoutes.use(authenticateToken);
-adminRoutes.use(requireRole(["admin"]));
+adminRoutes.use(requireRole([UserRole.ADMIN]));
 
 // Admin user management
 adminRoutes.post(

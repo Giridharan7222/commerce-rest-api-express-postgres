@@ -1,4 +1,4 @@
-import sequelize from "../database/connection";
+import { database as sequelize } from "../config";
 import { QueryTypes } from "sequelize";
 
 export interface SystemHealthData {

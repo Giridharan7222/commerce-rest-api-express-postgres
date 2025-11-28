@@ -34,9 +34,12 @@ describe("User Validator", () => {
         },
       } as Request;
 
-      const result = createUserPayload(req);
-
-      expect(result.role).to.equal("admin");
+      try {
+        createUserPayload(req);
+        throw new Error("Expected error not thrown");
+      } catch (error: any) {
+        expect(error.message).to.equal("You are not allowed to set admin role");
+      }
     });
 
     it("should extract all required fields", () => {

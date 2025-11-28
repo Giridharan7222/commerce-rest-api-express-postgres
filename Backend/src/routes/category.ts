@@ -5,7 +5,7 @@ import {
   getCategoryController,
   updateCategoryController,
   deleteCategoryController,
-} from "../controllers/product";
+} from "../controllers/category";
 import {
   createCategoryValidation,
   updateCategoryValidation,

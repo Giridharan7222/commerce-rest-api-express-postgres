@@ -3,7 +3,7 @@ import { TransactionStatus } from "../enums/payment";
 import { PaymentStatus } from "../enums/order";
 import { InvoiceStatus } from "../enums/payment";
 import StripeService from "./stripe";
-import sequelize from "../database/connection";
+import { database as sequelize } from "../config";
 import { Transaction } from "sequelize";
 
 export class PaymentService {

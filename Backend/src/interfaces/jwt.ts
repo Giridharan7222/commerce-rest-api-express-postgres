@@ -22,6 +22,7 @@ export interface JwtPayload {
   role: UserRole;
   profile?: JwtProfilePayload | null;
   addresses?: JwtAddressPayload[];
+  stripeCustomerId?: string;
   iat?: number;
   exp?: number;
 }

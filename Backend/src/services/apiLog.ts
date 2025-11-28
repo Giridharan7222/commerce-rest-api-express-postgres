@@ -1,12 +1,5 @@
 import { ApiLog } from "../models";
-
-interface LogApiParams {
-  userId?: string;
-  method: string;
-  endpoint: string;
-  statusCode: number;
-  ipAddress: string;
-}
+import { LogApiParams } from "../interfaces";
 
 export async function logApiActivity(params: LogApiParams) {
   try {

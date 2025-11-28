@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 import { User, CustomerProfile, AdminProfile, Address } from "../models";
+import StripeCustomer from "../models/stripeCustomer";
 import { LoginDto } from "../dtos/user";
 import { UserRole } from "../enums/user";
 import {
@@ -64,12 +65,18 @@ export async function loginUser(dto: LoginDto) {
     is_default: addr.is_default,
   }));
 
+  // Fetch stripe customer ID
+  const stripeCustomer = await StripeCustomer.findOne({
+    where: { user_id: user.id },
+  });
+
   const tokenPayload: JwtPayload = {
     id: user.id,
     email: user.email,
     role: user.role as UserRole,
     profile: profileData,
     addresses: addressesData,
+    stripeCustomerId: stripeCustomer?.stripe_customer_id,
   };
 
   const token = jwt.sign(tokenPayload, JWT_SECRET, {
@@ -126,12 +133,18 @@ export async function refreshToken(userId: string) {
     is_default: addr.is_default,
   }));
 
+  // Fetch stripe customer ID
+  const stripeCustomer = await StripeCustomer.findOne({
+    where: { user_id: user.id },
+  });
+
   const tokenPayload: JwtPayload = {
     id: user.id,
     email: user.email,
     role: user.role as UserRole,
     profile: profileData,
     addresses: addressesData,
+    stripeCustomerId: stripeCustomer?.stripe_customer_id,
   };
 
   const token = jwt.sign(tokenPayload, JWT_SECRET, {

@@ -1,4 +1,48 @@
 paths:
+  /api/payment-methods/create:
+    post:
+      summary: Create and save payment method with card details
+      tags: [Payment Methods]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - testToken
+              properties:
+                testToken:
+                  type: string
+                  example: "pm_card_visa"
+                  description: "Stripe test tokens: pm_card_visa, pm_card_mastercard, pm_card_amex, pm_card_visa_debit"
+                isDefault:
+                  type: boolean
+                  default: false
+                  example: true
+      responses:
+        "201":
+          description: Payment method created and saved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Payment method created and saved successfully"
+                  data:
+                    $ref: "#/components/schemas/PaymentMethod"
+        "400":
+          description: Validation error or Stripe error
+        "401":
+          description: Unauthorized
+
   /api/payment-methods:
     post:
       summary: Save payment method

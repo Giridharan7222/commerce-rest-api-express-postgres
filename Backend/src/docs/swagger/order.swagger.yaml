@@ -159,6 +159,42 @@ paths:
         "401":
           description: Unauthorized
 
+  /api/orders/{orderId}/complete-payment:
+    patch:
+      summary: Complete payment for order
+      tags: [Orders]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: orderId
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Payment completed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Payment completed successfully"
+                  data:
+                    $ref: "#/components/schemas/Order"
+        "400":
+          description: Payment already completed or order cancelled
+        "404":
+          description: Order not found
+        "401":
+          description: Unauthorized
+
   /api/orders/{orderId}/status:
     patch:
       summary: Update order status (Admin only)
@@ -252,7 +288,7 @@ components:
           enum: [pending, processing, shipped, delivered, cancelled]
         payment_status:
           type: string
-          enum: [pending, paid, failed]
+          enum: [pending, paid, failed, cancelled]
         payment_method:
           type: string
         shipping_address:

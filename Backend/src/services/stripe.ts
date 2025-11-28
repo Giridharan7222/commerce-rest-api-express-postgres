@@ -61,6 +61,23 @@ class StripeService {
     });
   }
 
+  async createPaymentMethod(
+    cardNumber: string,
+    expMonth: number,
+    expYear: number,
+    cvc: string,
+  ): Promise<Stripe.PaymentMethod> {
+    return await this.stripe.paymentMethods.create({
+      type: "card",
+      card: {
+        number: cardNumber,
+        exp_month: expMonth,
+        exp_year: expYear,
+        cvc: cvc,
+      },
+    });
+  }
+
   // 3. Payment Handling
   async createPaymentIntent(
     amount: number,
@@ -71,7 +88,10 @@ class StripeService {
     const params: Stripe.PaymentIntentCreateParams = {
       amount,
       currency,
-      automatic_payment_methods: { enabled: true },
+      automatic_payment_methods: {
+        enabled: true,
+        allow_redirects: "never",
+      },
     };
 
     if (customerId) params.customer = customerId;

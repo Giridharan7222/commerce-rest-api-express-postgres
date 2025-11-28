@@ -1,12 +1,6 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { getAdminActivityLogs } from "../services/adminActivityLog";
-
-interface AdminRequest extends Request {
-  user?: {
-    id: string;
-    role: string;
-  };
-}
+import { AdminRequest } from "../interfaces";
 
 export async function getActivityLogs(req: AdminRequest, res: Response) {
   try {

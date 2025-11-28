@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import sequelize from "../database/connection";
+import { testDatabase as sequelize } from "../config";
 import { User } from "../models";
 import { createUser } from "../services/user";
 import { CreateUserDto } from "../dtos/user";

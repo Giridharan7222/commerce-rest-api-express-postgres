@@ -36,8 +36,8 @@ export function createAdminActivityLogger(
         action,
         targetTable,
         targetId,
-        beforeData,
-        afterData,
+        beforeData: beforeData || undefined,
+        afterData: afterData || undefined,
       });
 
       return originalSend.call(this, data);

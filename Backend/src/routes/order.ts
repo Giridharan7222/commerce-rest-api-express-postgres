@@ -15,6 +15,7 @@ router.post("/", checkSchema(createOrderSchema), OrderController.createOrder);
 router.get("/", OrderController.getOrderHistory);
 router.get("/:orderId", OrderController.getOrderById);
 router.patch("/:orderId/cancel", OrderController.cancelOrder);
+router.patch("/:orderId/complete-payment", OrderController.completePayment);
 router.patch(
   "/:orderId/status",
   checkSchema(updateOrderStatusSchema),
