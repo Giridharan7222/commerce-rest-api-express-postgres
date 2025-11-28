@@ -67,10 +67,10 @@ Backend/
 
 3. **Environment configuration:**
    ```bash
-   # Copy environment file
-   cp config/env/.env.example config/env/.env.local
+   # Environment file is located at:
+   # Backend/config/env/.env
    
-   # Edit the .env.local file with your configuration
+   # Edit the existing .env file with your configuration
    ```
 
 4. **Start development server:**
@@ -272,30 +272,58 @@ yarn format
 
 ## Environment Variables
 
-Create a `.env.local` file in `config/env/` with:
+The `.env` file is located at `Backend/config/env/.env` and contains:
 
 ```env
-# Database
+# Server Configuration
+PORT=5005
+NODE_ENV=development
+API_BASE_URL=http://localhost:5005
+
+# Database Configuration
 DB_HOST=localhost
 DB_PORT=5433
 DB_NAME=mydb
 DB_USER=dbuser
 DB_PASSWORD=dbpass123
+DATABASE_URL=postgresql://dbuser:dbpass123@localhost:5433/mydb
 
-# Server
-PORT=5005
-NODE_ENV=development
+# JWT Authentication
+JWT_SECRET=your-super-secret-jwt-key-here
+JWT_EXPIRES_IN=24h
+JWT_REFRESH_EXPIRES_IN=7d
 
-# JWT
-JWT_SECRET=your-jwt-secret
+# Stripe Payment Integration
+STRIPE_SECRET_KEY=sk_test_your_stripe_secret_key
+STRIPE_PUBLISHABLE_KEY=pk_test_your_stripe_publishable_key
+STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
 
-# Stripe
-STRIPE_SECRET_KEY=your-stripe-secret-key
-
-# Cloudinary
+# Cloudinary File Upload
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
+CLOUDINARY_FOLDER=commerce-app
+
+# Email Configuration (Optional)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
+
+# CORS Configuration
+CORS_ORIGIN=http://localhost:3000,http://localhost:3001
+
+# Rate Limiting
+RATE_LIMIT_WINDOW_MS=900000
+RATE_LIMIT_MAX_REQUESTS=100
+
+# File Upload Limits
+MAX_FILE_SIZE=5242880
+MAX_FILES_COUNT=10
+
+# Logging
+LOG_LEVEL=info
+LOG_FILE=logs/app.log
 ```
 
 ## Additional Information
