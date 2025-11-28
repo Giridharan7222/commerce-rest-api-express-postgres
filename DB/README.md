@@ -1,6 +1,11 @@
 # Database Setup
 
-PostgreSQL database with Flyway migrations for the commerce application.
+PostgreSQL database with Flyway migrations for the commerce application, containerized with Docker.
+
+## Prerequisites
+
+- **Docker** and **Docker Compose**
+- **PostgreSQL** client tools (optional)
 
 ## Database Structure
 
@@ -38,6 +43,11 @@ PostgreSQL database with Flyway migrations for the commerce application.
 # Stop services
 ./env/local/_down.sh
 ```
+
+## Docker Services
+
+- **PostgreSQL** - PostGIS-enabled database (port 5433)
+- **Flyway** - Automatic migration runner
 
 ## Database Access
 
