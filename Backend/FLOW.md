@@ -5,7 +5,9 @@ Complete step-by-step API flows for Customer and Admin operations.
 ## 📋 Customer Order Flow (Detailed)
 
 ### 1. Account Setup
+
 **New Customer Registration:**
+
 ```bash
 POST /api/signup
 {
@@ -15,6 +17,7 @@ POST /api/signup
 ```
 
 **Existing Customer Login:**
+
 ```bash
 POST /api/login
 {
@@ -22,9 +25,11 @@ POST /api/login
   "password": "password"
 }
 ```
+
 > **Save JWT token** from response for all subsequent requests
 
 ### 2. Profile Creation (New Customers)
+
 ```bash
 POST /api/users/profile
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -37,6 +42,7 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 3. Address Management (New Customers)
+
 ```bash
 POST /api/users/addresses
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -54,23 +60,29 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 4. Browse Products
+
 **Get Categories:**
+
 ```bash
 GET /api/categories
 ```
 
 **Get Products by Category:**
+
 ```bash
 GET /api/products?categoryId=<CATEGORY_ID>
 ```
 
 **Search Products:**
+
 ```bash
 GET /api/products?search=laptop&minPrice=500&maxPrice=2000&page=1&limit=10
 ```
 
 ### 5. Shopping Cart Management
+
 **Add to Cart:**
+
 ```bash
 POST /api/cart
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -81,12 +93,14 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **View Cart:**
+
 ```bash
 GET /api/cart
 Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Update Cart Item:**
+
 ```bash
 PUT /api/cart/<PRODUCT_ID>
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -96,7 +110,9 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 6. Payment Setup
+
 **Create Stripe Customer:**
+
 ```bash
 POST /api/stripe/customers
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -107,6 +123,7 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 7. Order Placement
+
 ```bash
 POST /api/orders
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -123,9 +140,11 @@ Headers: Authorization: Bearer <JWT_TOKEN>
   "paymentMethod": "credit_card"
 }
 ```
+
 > **Save paymentIntent.id** from response
 
 ### 8. Payment Completion
+
 ```bash
 POST /api/stripe/process-payment
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -142,6 +161,7 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ## 🔧 Admin Management Flow (Detailed)
 
 ### 1. Admin Login
+
 ```bash
 POST /api/login
 {
@@ -149,9 +169,11 @@ POST /api/login
   "password": "password"
 }
 ```
+
 > **Save JWT token** for admin operations
 
 ### 2. Create New Admin (Admin Only)
+
 ```bash
 POST /api/users/create-admin
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -162,7 +184,9 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 3. Category Management
+
 **Create Category:**
+
 ```bash
 POST /api/categories
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -173,6 +197,7 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Update Category:**
+
 ```bash
 PUT /api/categories/<CATEGORY_ID>
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -183,13 +208,16 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Delete Category:**
+
 ```bash
 DELETE /api/categories/<CATEGORY_ID>
 Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 4. Product Management
+
 **Create Product (JSON):**
+
 ```bash
 POST /api/products
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -204,6 +232,7 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Create Product with Images (Form Data):**
+
 ```bash
 POST /api/products/upload
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -220,6 +249,7 @@ Form Data:
 ```
 
 **Update Product:**
+
 ```bash
 PUT /api/products/<PRODUCT_ID>
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -231,13 +261,16 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Delete Product:**
+
 ```bash
 DELETE /api/products/<PRODUCT_ID>
 Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 5. Product Image Management
+
 **Add Product Image:**
+
 ```bash
 POST /api/product-images
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -249,6 +282,7 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Update Product Image:**
+
 ```bash
 PUT /api/product-images/<IMAGE_ID>
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -259,19 +293,23 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Delete Product Image:**
+
 ```bash
 DELETE /api/product-images/<IMAGE_ID>
 Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 6. User Management (Admin Only)
+
 **Get All Users:**
+
 ```bash
 GET /api/users
 Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Update User:**
+
 ```bash
 PUT /api/users/<USER_ID>
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -282,13 +320,16 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Delete User:**
+
 ```bash
 DELETE /api/users/<USER_ID>
 Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 7. Order Management (Admin Only)
+
 **Update Order Status:**
+
 ```bash
 PATCH /api/orders/<ORDER_ID>/status
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -298,13 +339,16 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 ### 8. System Health Monitoring
+
 **Get System Health:**
+
 ```bash
 GET /api/system-health
 Headers: Authorization: Bearer <JWT_TOKEN>
 ```
 
 **Create Health Record:**
+
 ```bash
 POST /api/system-health
 Headers: Authorization: Bearer <JWT_TOKEN>
@@ -323,37 +367,44 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ## 📊 Additional API Endpoints
 
 ### Authentication & Token Management
+
 - `POST /api/logout` - User logout
 - `POST /api/refresh` - Refresh JWT token
 - `GET /api/verify` - Verify token validity
 - `GET /api/me` - Get current user info
 
 ### Profile & Address Management
+
 - `PUT /api/users/profile` - Update user profile
 - `GET /api/users/addresses` - Get user addresses
 - `PUT /api/addresses/:id` - Update specific address
 - `DELETE /api/addresses/:id` - Delete address
 
 ### Advanced Product Features
+
 - `GET /api/products/:id` - Get single product details
 - `GET /api/products/:productId/images` - Get product images
 
 ### Cart Operations
+
 - `DELETE /api/cart/:productId` - Remove item from cart
 - `DELETE /api/cart` - Clear entire cart
 
 ### Order History & Management
+
 - `GET /api/orders/:orderId` - Get specific order details
 - `PATCH /api/orders/:orderId/cancel` - Cancel order
 - `PATCH /api/orders/:orderId/complete-payment` - Complete payment
 
 ### Payment Methods
+
 - `POST /api/payment-methods/create` - Create & save payment method
 - `POST /api/payment-methods` - Save existing payment method
 - `GET /api/payment-methods` - Get saved payment methods
 - `DELETE /api/payment-methods/:id` - Delete payment method
 
 ### Stripe Integration
+
 - `POST /api/stripe/setup-intents` - Create setup intent for saving cards
 - `POST /api/stripe/payment-intents` - Create payment intent
 - `GET /api/stripe/customers/:customerId/cards` - Get customer's saved cards
@@ -364,22 +415,26 @@ Headers: Authorization: Bearer <JWT_TOKEN>
 ## 🧪 Test Data
 
 ### Test Accounts
+
 - **Customer**: `giri.customer@commerce.com` / `password`
 - **Admin**: `giri.admin@commerce.com` / `password`
 
 ### Stripe Test Payment Methods
+
 - **Visa**: `pm_card_visa`
 - **Mastercard**: `pm_card_mastercard`
 - **American Express**: `pm_card_amex`
 - **Declined Card**: `pm_card_chargeDeclined`
 
 ### Sample Request Headers
+
 ```
 Authorization: Bearer <JWT_TOKEN>
 Content-Type: application/json
 ```
 
 ### Sample Error Response
+
 ```json
 {
   "success": false,
@@ -405,6 +460,7 @@ Content-Type: application/json
 - CORS is configured for cross-origin requests
 
 For more information, see:
+
 - **Main Documentation**: `README.md`
 - **API Documentation**: http://localhost:5005/api-docs
 - **Database Schema**: `../DB/readme/DATABASE_SCHEMA.md`

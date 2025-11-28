@@ -53,24 +53,28 @@ Backend/
 ## Installation & Setup
 
 1. **Install dependencies:**
+
    ```bash
    yarn install
    ```
 
 2. **Setup database:**
+
    ```bash
    # Navigate to DB folder and start database
    cd ../DB
    ./env/local/_up.sh
    cd ../Backend
    ```
+
    > **For detailed database setup**: [DB README](https://github.com/Giridharan7222/commerce-rest-api-express-postgres/blob/main/DB/README.md)
 
 3. **Environment configuration:**
+
    ```bash
    # Environment file is located at:
    # Backend/config/env/.env
-   
+
    # Edit the existing .env file with your configuration
    ```
 
@@ -96,11 +100,13 @@ Backend/
 ### Starting the Application
 
 1. **Start database services:**
+
    ```bash
    yarn db:start
    ```
 
 2. **Start the API server:**
+
    ```bash
    yarn dev
    ```
@@ -112,6 +118,7 @@ Backend/
 ### API Documentation
 
 The API uses Swagger for documentation. Once the server is running, visit:
+
 - **Swagger UI**: http://localhost:5005/api-docs
 
 ### Testing
@@ -131,6 +138,7 @@ yarn format
 ## Architecture & Components
 
 ### Middleware Stack
+
 - **Authentication** - JWT token validation
 - **CORS** - Cross-origin resource sharing
 - **Rate Limiting** - Request throttling and abuse prevention
@@ -141,6 +149,7 @@ yarn format
 - **Admin Activity Logger** - Admin action tracking
 
 ### Data Models (24 Tables)
+
 - **User Management**: users, customer_profiles, admin_profiles, addresses
 - **Product Catalog**: categories, products, product_images
 - **Shopping**: cart_items, orders, order_items
@@ -149,6 +158,7 @@ yarn format
 - **System**: system_configs, system_health, admin_activity_logs, api_logs
 
 ### Services Layer
+
 - **Authentication Service** - User login/registration
 - **User Service** - Profile and address management
 - **Product Service** - Catalog management
@@ -159,6 +169,7 @@ yarn format
 - **System Health Service** - Health monitoring
 
 ### Validation & DTOs
+
 - **Input Validation** - Express-validator schemas
 - **Data Transfer Objects** - Type-safe data structures
 - **Custom Validators** - Business logic validation
@@ -182,16 +193,29 @@ yarn format
 📋 **For detailed step-by-step API flows, see**: [`FLOW.md`](./FLOW.md)
 
 ### Quick Reference
+
 - **Customer Flow**: Signup → Profile → Browse → Cart → Order → Payment
 - **Admin Flow**: Login → Manage Categories → Products → Images → System Health
 
-### Test Accounts
+### Test Accounts & Seeded Data
+
 - **Customer**: `giri.customer@commerce.com` / `password`
 - **Admin**: `giri.admin@commerce.com` / `password`
+
+**Pre-seeded Data Available:**
+
+- **Categories**: Electronics, Clothing, Books, Home & Garden
+- **Products**: Sample products in each category with images
+- **User Profiles**: Complete profiles for test accounts
+- **Addresses**: Sample shipping addresses
+- **System Health**: Initial health records
+
+> **Note**: Database includes sample data for immediate testing. See [DB README](https://github.com/Giridharan7222/commerce-rest-api-express-postgres/blob/main/DB/README.md) for seeding details.
 
 ## API Endpoints Overview
 
 ### Authentication & Token Management
+
 - `POST /api/signup` - User registration
 - `POST /api/login` - User login
 - `POST /api/logout` - User logout
@@ -200,6 +224,7 @@ yarn format
 - `GET /api/me` - Get current user info
 
 ### User Management
+
 - `POST /api/users/create-admin` - Create admin account (Admin only)
 - `GET /api/users` - Get all users (Admin only)
 - `GET /api/users/:id` - Get user by ID
@@ -207,6 +232,7 @@ yarn format
 - `DELETE /api/users/:id` - Delete user (Admin only)
 
 ### Profile & Address Management
+
 - `POST /api/users/profile` - Create user profile
 - `PUT /api/users/profile` - Update user profile
 - `POST /api/users/addresses` - Add user address
@@ -215,6 +241,7 @@ yarn format
 - `DELETE /api/addresses/:id` - Delete address
 
 ### Categories
+
 - `POST /api/categories` - Create category (Admin only)
 - `GET /api/categories` - Get all categories
 - `GET /api/categories/:id` - Get category by ID
@@ -222,6 +249,7 @@ yarn format
 - `DELETE /api/categories/:id` - Delete category (Admin only)
 
 ### Products
+
 - `POST /api/products` - Create product (Admin only)
 - `POST /api/products/upload` - Create product with images (Admin only)
 - `GET /api/products` - Get products with filters
@@ -230,12 +258,14 @@ yarn format
 - `DELETE /api/products/:id` - Delete product (Admin only)
 
 ### Product Images
+
 - `POST /api/product-images` - Add product image (Admin only)
 - `GET /api/products/:productId/images` - Get product images
 - `PUT /api/product-images/:id` - Update product image (Admin only)
 - `DELETE /api/product-images/:id` - Delete product image (Admin only)
 
 ### Shopping Cart
+
 - `POST /api/cart` - Add to cart
 - `GET /api/cart` - Get cart
 - `PUT /api/cart/:productId` - Update cart item
@@ -243,6 +273,7 @@ yarn format
 - `DELETE /api/cart` - Clear cart
 
 ### Orders
+
 - `POST /api/orders` - Create order
 - `GET /api/orders` - Get order history
 - `GET /api/orders/:orderId` - Get order details
@@ -251,6 +282,7 @@ yarn format
 - `PATCH /api/orders/:orderId/status` - Update order status (Admin only)
 
 ### Stripe Integration
+
 - `POST /api/stripe/customers` - Create Stripe customer
 - `POST /api/stripe/setup-intents` - Create setup intent
 - `POST /api/stripe/payment-intents` - Create payment intent
@@ -259,16 +291,19 @@ yarn format
 - `POST /api/stripe/webhooks` - Stripe webhooks
 
 ### Payment Methods
+
 - `POST /api/payment-methods/create` - Create & save payment method
 - `POST /api/payment-methods` - Save payment method
 - `GET /api/payment-methods` - Get saved payment methods
 - `DELETE /api/payment-methods/:id` - Delete payment method
 
 ### System Health
+
 - `GET /api/system-health` - Get system health (Admin only)
 - `POST /api/system-health` - Create health record (Admin only)
 
 ### Health Check
+
 - `GET /health` - API health check
 
 ## Environment Variables
@@ -330,7 +365,9 @@ LOG_FILE=logs/app.log
 ## Additional Information
 
 For more details:
-- **Database setup**: [DB README](https://github.com/Giridharan7222/commerce-rest-api-express-postgres/blob/main/DB/README.md)
+
+- **Database setup & seeding**: [DB README](https://github.com/Giridharan7222/commerce-rest-api-express-postgres/blob/main/DB/README.md)
 - **Database schema**: See `../DB/readme/DATABASE_SCHEMA.md`
 - **API flows**: [FLOW.md](./FLOW.md)
+- **Seeded test data**: Categories, products, users, and sample records included
 - **Tech stack overview**: See main project README

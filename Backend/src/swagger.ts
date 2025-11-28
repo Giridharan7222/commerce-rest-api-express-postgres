@@ -21,6 +21,7 @@ const options = {
 8. **Payment**: POST /api/stripe/process-payment
 
 **Test Account**: giri.customer@commerce.com / password
+**Seeded Data**: Categories, products, and sample records available for testing
 
 ## Admin Management Flow:
 1. **Login**: POST /api/login (giri.admin@commerce.com / password)
@@ -31,6 +32,7 @@ const options = {
 6. **System Health**: GET/POST /api/system-health (monitor)
 
 **Test Admin**: giri.admin@commerce.com / password
+**Pre-loaded**: Sample categories, products, and system data included
 
 **Note**: Additional APIs available for user management, order management, payment methods, and more. See individual endpoint documentation below.
 
