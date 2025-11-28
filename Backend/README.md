@@ -88,12 +88,12 @@ Backend/
 - `yarn dev` - Start development server with hot reload
 - `yarn start` - Start production server
 - `yarn build` - Build TypeScript to JavaScript
-- `yarn test` - Run Jest test suite
 - `yarn test:mocha` - Run Mocha test suite
 - `yarn format` - Format code with Prettier
 - `yarn format:check` - Check code formatting
 - `yarn db:start` - Start database services
 - `yarn db:stop` - Stop database services
+- `yarn test` - Run Jest test suite
 
 ## Development
 
