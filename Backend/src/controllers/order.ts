@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { validationResult } from "express-validator";
+import { handleValidationErrors } from "../utils/validation";
 import { OrderService } from "../services/order";
 import { OrderStatus } from "../enums/order";
 import {
@@ -11,15 +11,7 @@ import { AuthRequest } from "../interfaces/auth";
 export class OrderController {
   static async createOrder(req: AuthRequest, res: Response) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return (res as any).fail(
-          "Validation failed",
-          "VALIDATION_ERROR",
-          errors.array(),
-          400,
-        );
-      }
+      if (handleValidationErrors(req, res)) return;
 
       const userId = req.user?.id;
       const userEmail = req.user?.email;
@@ -128,15 +120,7 @@ export class OrderController {
 
   static async updateOrderStatus(req: AuthRequest, res: Response) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return (res as any).fail(
-          "Validation failed",
-          "VALIDATION_ERROR",
-          errors.array(),
-          400,
-        );
-      }
+      if (handleValidationErrors(req, res)) return;
 
       const { orderId } = req.params;
       const { status } = updateOrderStatusPayload(req);

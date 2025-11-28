@@ -1,5 +1,5 @@
 import { Response } from "express";
-import { validationResult } from "express-validator";
+import { handleValidationErrors } from "../utils/validation";
 import { PaymentMethod } from "../models";
 import { savePaymentMethodPayload } from "../validators/payment";
 import StripeService from "../services/stripe";
@@ -9,15 +9,7 @@ import { AuthRequest } from "../interfaces/auth";
 export class PaymentMethodController {
   static async savePaymentMethod(req: AuthRequest, res: Response) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return (res as any).fail(
-          "Validation failed",
-          "VALIDATION_ERROR",
-          errors.array(),
-          400,
-        );
-      }
+      if (handleValidationErrors(req, res)) return;
 
       const userId = req.user?.id;
       if (!userId) {

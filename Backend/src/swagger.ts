@@ -153,13 +153,13 @@ const options = {
             id: { type: "string", format: "uuid" },
             server_status: {
               type: "string",
-              enum: ["UP", "DOWN", "MAINTENANCE", "DEGRADED"]
+              enum: ["UP", "DOWN", "MAINTENANCE", "DEGRADED"],
             },
             cpu_usage: { type: "number", minimum: 0, maximum: 100 },
             memory_usage: { type: "number", minimum: 0, maximum: 100 },
             disk_usage: { type: "number", minimum: 0, maximum: 100 },
-            checked_at: { type: "string", format: "date-time" }
-          }
+            checked_at: { type: "string", format: "date-time" },
+          },
         },
         SystemHealthInput: {
           type: "object",
@@ -167,12 +167,12 @@ const options = {
           properties: {
             server_status: {
               type: "string",
-              enum: ["UP", "DOWN", "MAINTENANCE", "DEGRADED"]
+              enum: ["UP", "DOWN", "MAINTENANCE", "DEGRADED"],
             },
             cpu_usage: { type: "number", minimum: 0, maximum: 100 },
             memory_usage: { type: "number", minimum: 0, maximum: 100 },
-            disk_usage: { type: "number", minimum: 0, maximum: 100 }
-          }
+            disk_usage: { type: "number", minimum: 0, maximum: 100 },
+          },
         },
       },
     },

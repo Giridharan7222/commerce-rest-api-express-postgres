@@ -1,17 +1,9 @@
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { handleValidationErrors } from "../utils/validation";
 import { loginUser, refreshToken, verifyToken } from "../services/auth";
 
 export const login = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const loginData = {

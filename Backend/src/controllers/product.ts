@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { handleValidationErrors } from "../utils/validation";
 import {
   createCategory,
   getAllCategories,
@@ -30,15 +30,7 @@ export const createCategoryController = async (
   req: AdminRequest,
   res: Response,
 ) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const adminId = req.user?.role === "admin" ? req.user.id : undefined;
@@ -98,15 +90,7 @@ export const updateCategoryController = async (
   req: AdminRequest,
   res: Response,
 ) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const categoryId = req.params.id;
@@ -143,15 +127,7 @@ export const deleteCategoryController = async (
 };
 
 export const createProductController = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const product = await createProduct(req.body);
@@ -226,15 +202,7 @@ export const getProductController = async (req: Request, res: Response) => {
 };
 
 export const updateProductController = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const productId = req.params.id;
@@ -269,15 +237,7 @@ export const createProductImageController = async (
   req: Request,
   res: Response,
 ) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const productImage = await createProductImage(req.body);
@@ -322,15 +282,7 @@ export const updateProductImageController = async (
   req: Request,
   res: Response,
 ) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const imageId = req.params.id;

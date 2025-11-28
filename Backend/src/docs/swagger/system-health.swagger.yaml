@@ -65,7 +65,7 @@ paths:
                   message:
                     type: string
                   data:
-                    $ref: '#/components/schemas/SystemHealth'
+                    $ref: "#/components/schemas/SystemHealth"
         "401":
           description: Unauthorized
         "403":
@@ -80,7 +80,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SystemHealthInput'
+              $ref: "#/components/schemas/SystemHealthInput"
       responses:
         "201":
           description: System health record created successfully
@@ -94,7 +94,7 @@ paths:
                   message:
                     type: string
                   data:
-                    $ref: '#/components/schemas/SystemHealth'
+                    $ref: "#/components/schemas/SystemHealth"
         "401":
           description: Unauthorized
         "403":

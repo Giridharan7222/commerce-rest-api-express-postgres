@@ -1,10 +1,20 @@
 import { Request, Response } from "express";
-import { getSystemHealth, createSystemHealthRecord } from "../services/systemHealth";
+import {
+  getSystemHealth,
+  createSystemHealthRecord,
+} from "../services/systemHealth";
 
-export const getSystemHealthController = async (req: Request, res: Response) => {
+export const getSystemHealthController = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const health = await getSystemHealth();
-    return (res as any).success("System health retrieved successfully", health, 200);
+    return (res as any).success(
+      "System health retrieved successfully",
+      health,
+      200,
+    );
   } catch (error) {
     return (res as any).fail(
       "Failed to get system health",
@@ -15,10 +25,17 @@ export const getSystemHealthController = async (req: Request, res: Response) => 
   }
 };
 
-export const createSystemHealthController = async (req: Request, res: Response) => {
+export const createSystemHealthController = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const healthRecord = await createSystemHealthRecord(req.body);
-    return (res as any).success("System health record created successfully", healthRecord, 201);
+    return (res as any).success(
+      "System health record created successfully",
+      healthRecord,
+      201,
+    );
   } catch (error) {
     return (res as any).fail(
       "Failed to create system health record",

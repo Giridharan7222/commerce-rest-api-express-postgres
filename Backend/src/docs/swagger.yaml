@@ -1426,7 +1426,7 @@ paths:
         - bearerAuth: []
       description: |
         🔐 **Admin Only**: This endpoint requires admin authentication.
-        
+
         Retrieves the latest system health status including server status and resource usage metrics.
       responses:
         "200":
@@ -1443,7 +1443,7 @@ paths:
                     type: string
                     example: "System health retrieved successfully"
                   data:
-                    $ref: '#/components/schemas/SystemHealth'
+                    $ref: "#/components/schemas/SystemHealth"
         "401":
           description: Unauthorized - Invalid or missing JWT token
         "403":
@@ -1455,14 +1455,14 @@ paths:
         - bearerAuth: []
       description: |
         🔐 **Admin Only**: This endpoint requires admin authentication.
-        
+
         Creates a new system health record with server status and optional resource usage metrics.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SystemHealthInput'
+              $ref: "#/components/schemas/SystemHealthInput"
             examples:
               basicHealth:
                 summary: Basic health status
@@ -1490,7 +1490,7 @@ paths:
                     type: string
                     example: "System health record created successfully"
                   data:
-                    $ref: '#/components/schemas/SystemHealth'
+                    $ref: "#/components/schemas/SystemHealth"
         "401":
           description: Unauthorized - Invalid or missing JWT token
         "403":

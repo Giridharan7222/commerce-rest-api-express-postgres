@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { handleValidationErrors } from "../utils/validation";
 import {
   createUser,
   createAdmin,
@@ -24,15 +24,7 @@ import {
 } from "../validators/user";
 
 export const createUserAccount = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const userPayload = createUserPayload(req);
@@ -53,15 +45,7 @@ export const createUserAccount = async (req: Request, res: Response) => {
 };
 
 export const createAdminAccount = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const adminPayload = createAdminPayload(req);
@@ -82,15 +66,7 @@ export const createAdminAccount = async (req: Request, res: Response) => {
 };
 
 export const createUserProfile = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const profilePayload = createCustomerProfilePayload(req);
@@ -107,15 +83,7 @@ export const createUserProfile = async (req: Request, res: Response) => {
 };
 
 export const createUserAddress = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const addressPayload = createAddressPayload(req);
@@ -180,15 +148,7 @@ export const getAllUsersController = async (req: Request, res: Response) => {
 };
 
 export const updateUserController = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const userId = req.params.id;
@@ -224,15 +184,7 @@ export const updateUserProfileController = async (
   req: Request,
   res: Response,
 ) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const userId = req.params.id;
@@ -250,15 +202,7 @@ export const updateUserProfileController = async (
 };
 
 export const updateAddressController = async (req: Request, res: Response) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return (res as any).fail(
-      "Validation failed",
-      "VALIDATION_ERROR",
-      errors.array(),
-      400,
-    );
-  }
+  if (handleValidationErrors(req, res)) return;
 
   try {
     const addressId = req.params.id;

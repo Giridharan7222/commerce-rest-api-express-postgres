@@ -1,21 +1,13 @@
 import { Response } from "express";
-import { validationResult } from "express-validator";
 import { CartService } from "../services/cart";
 import { addToCartPayload, updateCartItemPayload } from "../validators/cart";
 import { AuthRequest } from "../interfaces/auth";
+import { handleValidationErrors } from "../utils/validation";
 
 export class CartController {
   static async addToCart(req: AuthRequest, res: Response) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return (res as any).fail(
-          "Validation failed",
-          "VALIDATION_ERROR",
-          errors.array(),
-          400,
-        );
-      }
+      if (handleValidationErrors(req, res)) return;
 
       const userId = req.user?.id;
       if (!userId) {
@@ -61,15 +53,7 @@ export class CartController {
 
   static async updateCartItem(req: AuthRequest, res: Response) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return (res as any).fail(
-          "Validation failed",
-          "VALIDATION_ERROR",
-          errors.array(),
-          400,
-        );
-      }
+      if (handleValidationErrors(req, res)) return;
 
       const { productId } = req.params;
       const userId = req.user?.id;

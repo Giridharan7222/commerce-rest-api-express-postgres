@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { validationResult } from "express-validator";
+import { handleValidationErrors } from "../utils/validation";
 import StripeService from "../services/stripe";
 import { PaymentService } from "../services/payment";
 import { StripeCustomerService } from "../services/stripeCustomer";
@@ -90,15 +90,7 @@ export class StripeController {
   // Create payment intent
   async createPaymentIntent(req: AuthRequest, res: Response) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return (res as any).fail(
-          "Validation failed",
-          "VALIDATION_ERROR",
-          errors.array(),
-          400,
-        );
-      }
+      if (handleValidationErrors(req, res)) return;
 
       const userId = req.user?.id;
       const userEmail = req.user?.email;
@@ -169,15 +161,7 @@ export class StripeController {
   // Process payment
   async processPayment(req: AuthRequest, res: Response) {
     try {
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return (res as any).fail(
-          "Validation failed",
-          "VALIDATION_ERROR",
-          errors.array(),
-          400,
-        );
-      }
+      if (handleValidationErrors(req, res)) return;
 
       const userId = req.user?.id;
       if (!userId) {
