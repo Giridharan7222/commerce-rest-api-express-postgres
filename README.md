@@ -50,7 +50,8 @@ The application integrates **Stripe** for secure payment processing:
 - **Payment Processing**: Credit/debit card payments
 - **Customer Management**: Stripe customer profiles
 - **Payment Methods**: Save and manage payment methods
-- **Invoicing**: Automated invoice generation
+- **Invoice Generation**: Automated invoice creation with line items
+- **Invoice Management**: View, update status, and manage invoices
 - **Webhooks**: Real-time payment status updates
 - **Test Mode**: Safe testing with Stripe test cards
 

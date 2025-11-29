@@ -154,7 +154,7 @@ yarn format
 - **Product Catalog**: categories, products, product_images
 - **Shopping**: cart_items, orders, order_items
 - **Payment**: payment_transactions, payment_methods, refunds, stripe_customers
-- **Invoicing**: invoices, invoice_line_items
+- **Invoicing**: invoices, invoice_line_items (automated generation)
 - **System**: system_configs, system_health, admin_activity_logs, api_logs
 
 ### Services Layer
@@ -165,6 +165,7 @@ yarn format
 - **Cart Service** - Shopping cart operations
 - **Order Service** - Order processing
 - **Payment Service** - Payment handling
+- **Invoice Service** - Invoice generation and management
 - **Stripe Service** - Stripe integration
 - **System Health Service** - Health monitoring
 
@@ -183,6 +184,7 @@ yarn format
 - **Shopping Cart** functionality
 - **Order Management** system
 - **Payment Processing** with Stripe
+- **Invoice Generation** with automated line items
 - **File Upload** with Cloudinary
 - **API Documentation** with Swagger
 - **Rate Limiting** and security middleware
@@ -301,6 +303,15 @@ yarn format
 
 - `GET /api/system-health` - Get system health (Admin only)
 - `POST /api/system-health` - Create health record (Admin only)
+
+### Invoices
+
+- `POST /api/invoices` - Create invoice (Admin only)
+- `GET /api/invoices/my` - Get current user's invoices
+- `GET /api/invoices` - Get all invoices (Admin only)
+- `GET /api/invoices/:id` - Get invoice by ID
+- `PATCH /api/invoices/:id/status` - Update invoice status (Admin only)
+- `DELETE /api/invoices/:id` - Delete invoice (Admin only)
 
 ### Health Check
 

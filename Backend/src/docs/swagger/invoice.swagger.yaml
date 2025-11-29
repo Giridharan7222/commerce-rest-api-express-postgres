@@ -1,0 +1,267 @@
+paths:
+  /api/invoices:
+    post:
+      summary: Create invoice (Admin only)
+      tags: [Invoices]
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - orderId
+                - userId
+                - subTotal
+                - totalAmount
+                - lineItems
+              properties:
+                orderId:
+                  type: string
+                  format: uuid
+                  description: "Order ID for the invoice"
+                userId:
+                  type: string
+                  format: uuid
+                  description: "User ID for the invoice"
+                subTotal:
+                  type: number
+                  description: "Subtotal amount before tax and discount"
+                taxAmount:
+                  type: number
+                  description: "Tax amount"
+                  default: 0
+                discountAmount:
+                  type: number
+                  description: "Discount amount"
+                  default: 0
+                totalAmount:
+                  type: number
+                  description: "Total amount after tax and discount"
+                currency:
+                  type: string
+                  description: "Currency code"
+                  default: "INR"
+                lineItems:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - productId
+                      - productName
+                      - quantity
+                      - price
+                      - totalPrice
+                    properties:
+                      productId:
+                        type: string
+                        format: uuid
+                      productName:
+                        type: string
+                      quantity:
+                        type: integer
+                        minimum: 1
+                      price:
+                        type: number
+                      totalPrice:
+                        type: number
+                      taxRate:
+                        type: number
+                        default: 0
+                      taxAmount:
+                        type: number
+                        default: 0
+      responses:
+        "201":
+          description: Invoice created successfully
+        "400":
+          description: Validation error
+        "403":
+          description: Access denied
+
+    get:
+      summary: Get all invoices (Admin only)
+      tags: [Invoices]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: All invoices retrieved successfully
+        "403":
+          description: Access denied
+
+  /api/invoices/my:
+    get:
+      summary: Get current user's invoices
+      tags: [Invoices]
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: User invoices retrieved successfully
+        "401":
+          description: Unauthorized
+
+  /api/invoices/{id}:
+    get:
+      summary: Get invoice by ID
+      tags: [Invoices]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Invoice details retrieved successfully
+        "404":
+          description: Invoice not found
+        "401":
+          description: Unauthorized
+
+    delete:
+      summary: Delete invoice (Admin only)
+      tags: [Invoices]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Invoice deleted successfully
+        "404":
+          description: Invoice not found
+        "403":
+          description: Access denied
+
+  /api/invoices/{id}/status:
+    patch:
+      summary: Update invoice status (Admin only)
+      tags: [Invoices]
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [generated, paid, cancelled]
+                  description: "Invoice status"
+      responses:
+        "200":
+          description: Invoice status updated successfully
+        "400":
+          description: Validation error
+        "404":
+          description: Invoice not found
+        "403":
+          description: Access denied
+
+components:
+  schemas:
+    Invoice:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_number:
+          type: string
+        order_id:
+          type: string
+          format: uuid
+        user_id:
+          type: string
+          format: uuid
+        sub_total:
+          type: number
+        tax_amount:
+          type: number
+        discount_amount:
+          type: number
+        total_amount:
+          type: number
+        currency:
+          type: string
+        status:
+          type: string
+          enum: [generated, paid, cancelled]
+        stripe_invoice_id:
+          type: string
+        issued_at:
+          type: string
+          format: date-time
+        paid_at:
+          type: string
+          format: date-time
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/User"
+        order:
+          $ref: "#/components/schemas/Order"
+        lineItems:
+          type: array
+          items:
+            $ref: "#/components/schemas/InvoiceLineItem"
+
+    InvoiceLineItem:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        invoice_id:
+          type: string
+          format: uuid
+        product_id:
+          type: string
+          format: uuid
+        product_name:
+          type: string
+        quantity:
+          type: integer
+        price:
+          type: number
+        total_price:
+          type: number
+        tax_rate:
+          type: number
+        tax_amount:
+          type: number
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        productInfo:
+          $ref: "#/components/schemas/Product"

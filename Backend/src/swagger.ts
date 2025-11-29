@@ -19,6 +19,7 @@ const options = {
 6. **Stripe**: POST /api/stripe/customers
 7. **Order**: POST /api/orders
 8. **Payment**: POST /api/stripe/process-payment
+9. **Invoice**: GET /api/invoices/my (view invoices)
 
 **Test Account**: giri.customer@commerce.com / password
 **Seeded Data**: Categories, products, and sample records available for testing
@@ -29,7 +30,8 @@ const options = {
 3. **Categories**: POST /api/categories (create/manage)
 4. **Products**: POST /api/products OR POST /api/products/upload
 5. **Product Images**: POST /api/product-images (manage images)
-6. **System Health**: GET/POST /api/system-health (monitor)
+6. **Invoices**: POST /api/invoices (create), GET /api/invoices (manage)
+7. **System Health**: GET/POST /api/system-health (monitor)
 
 **Test Admin**: giri.admin@commerce.com / password
 **Pre-loaded**: Sample categories, products, and system data included
@@ -219,6 +221,7 @@ const options = {
     "./src/docs/swagger/stripe.swagger.yaml",
     "./src/docs/swagger/payment-methods.swagger.yaml",
     "./src/docs/swagger/system-health.swagger.yaml",
+    "./src/docs/swagger/invoice.swagger.yaml",
     "./src/app.ts",
   ],
 };
