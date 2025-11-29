@@ -75,7 +75,7 @@ Backend/
    # Environment file is located at:
    # Backend/config/env/.env
 
-   # Edit the existing .env file with your configuration
+   # add the .env file with your configuration
    ```
 
 4. **Start development server:**
