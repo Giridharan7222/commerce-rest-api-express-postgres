@@ -97,13 +97,7 @@ Backend/
 
 ### Starting the Application
 
-1. **Start database services:**
-
-   ```bash
-   yarn db:start
-   ```
-
-2. **Start the API server:**
+1. **Start the API server:**
 
    ```bash
    yarn dev
