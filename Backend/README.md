@@ -91,8 +91,6 @@ Backend/
 - `yarn test:mocha` - Run Mocha test suite
 - `yarn format` - Format code with Prettier
 - `yarn format:check` - Check code formatting
-- `yarn db:start` - Start database services
-- `yarn db:stop` - Stop database services
 - `yarn test` - Run Jest test suite
 
 ## Development
