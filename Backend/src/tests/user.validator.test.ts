@@ -62,7 +62,10 @@ describe("User Validator", () => {
     };
 
     it("should extract valid profile payload from request", () => {
-      const req = { body: { ...validProfilePayload } } as Request;
+      const req = { 
+        body: { ...validProfilePayload },
+        user: { id: "123e4567-e89b-12d3-a456-426614174000" }
+      } as any;
 
       const result = createCustomerProfilePayload(req);
 
@@ -86,7 +89,10 @@ describe("User Validator", () => {
     };
 
     it("should extract valid address payload from request", () => {
-      const req = { body: { ...validAddressPayload } } as Request;
+      const req = { 
+        body: { ...validAddressPayload },
+        user: { id: "123e4567-e89b-12d3-a456-426614174000" }
+      } as any;
 
       const result = createAddressPayload(req);
 

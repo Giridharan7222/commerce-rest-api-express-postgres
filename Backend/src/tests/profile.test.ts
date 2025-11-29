@@ -14,7 +14,10 @@ describe("Profile Tests", () => {
     };
 
     it("should validate valid profile payload", () => {
-      const req = { body: { ...validProfilePayload } } as Request;
+      const req = { 
+        body: { ...validProfilePayload },
+        user: { id: "123e4567-e89b-12d3-a456-426614174000" }
+      } as any;
       const result = createCustomerProfilePayload(req);
 
       expect(result.user_id).to.equal("123e4567-e89b-12d3-a456-426614174000");
@@ -28,7 +31,10 @@ describe("Profile Tests", () => {
         user_id: "123e4567-e89b-12d3-a456-426614174000",
         full_name: "John Doe",
       };
-      const req = { body: minimalPayload } as Request;
+      const req = { 
+        body: minimalPayload,
+        user: { id: "123e4567-e89b-12d3-a456-426614174000" }
+      } as any;
       const result = createCustomerProfilePayload(req);
 
       expect(result.full_name).to.equal("John Doe");
@@ -39,7 +45,10 @@ describe("Profile Tests", () => {
         ...validProfilePayload,
         phone: "invalid-phone",
       };
-      const req = { body: payloadWithPhone } as Request;
+      const req = { 
+        body: payloadWithPhone,
+        user: { id: "123e4567-e89b-12d3-a456-426614174000" }
+      } as any;
       const result = createCustomerProfilePayload(req);
 
       expect(result.phone).to.equal("invalid-phone");
@@ -50,7 +59,10 @@ describe("Profile Tests", () => {
         ...validProfilePayload,
         dob: "1990-12-25",
       };
-      const req = { body: payloadWithDOB } as Request;
+      const req = { 
+        body: payloadWithDOB,
+        user: { id: "123e4567-e89b-12d3-a456-426614174000" }
+      } as any;
       const result = createCustomerProfilePayload(req);
 
       expect(result.dob).to.be.instanceOf(Date);
@@ -63,7 +75,10 @@ describe("Profile Tests", () => {
         full_name: "Jane Smith",
         phone: "+0987654321",
       };
-      const req = { body: updatePayload } as Request;
+      const req = { 
+        body: updatePayload,
+        user: { id: "123e4567-e89b-12d3-a456-426614174000" }
+      } as any;
       const result = createCustomerProfilePayload(req);
 
       expect(result.full_name).to.equal("Jane Smith");

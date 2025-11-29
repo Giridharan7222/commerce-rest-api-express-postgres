@@ -14,6 +14,7 @@ import ProductImage from "../models/productImage";
 import { uploadFile } from "../utils/cloudinary";
 import { Op } from "sequelize";
 import { AdminLogger } from "../utils/adminLogger";
+import { Request } from "express";
 
 export async function createCategory(dto: CreateCategoryDto, adminId?: string) {
   // Check for duplicate category name
@@ -237,7 +238,7 @@ export async function deleteProduct(productId: string) {
 
 export async function createProductImage(
   productId: string,
-  files: Express.Multer.File[],
+  files: any[],
 ) {
   const product = await Product.findByPk(productId);
   if (!product) {

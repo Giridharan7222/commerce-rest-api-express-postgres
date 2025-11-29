@@ -17,7 +17,10 @@ describe("Address Tests", () => {
     };
 
     it("should validate valid address payload", () => {
-      const req = { body: { ...validAddressPayload } } as Request;
+      const req = { 
+        body: { ...validAddressPayload },
+        user: { id: "123e4567-e89b-12d3-a456-426614174000" }
+      } as any;
       const result = createAddressPayload(req);
 
       expect(result.user_id).to.equal("123e4567-e89b-12d3-a456-426614174000");
@@ -81,7 +84,10 @@ describe("Address Tests", () => {
         state: "CA",
         pincode: "90210",
       };
-      const req = { body: updatePayload } as Request;
+      const req = { 
+        body: updatePayload,
+        user: { id: "123e4567-e89b-12d3-a456-426614174000" }
+      } as any;
       const result = createAddressPayload(req);
 
       expect(result.address_line1).to.equal("456 Oak Avenue");
