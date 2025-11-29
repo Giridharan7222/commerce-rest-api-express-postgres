@@ -65,6 +65,7 @@ router.post(
   "/product-images",
   authenticateToken,
   requireRole([UserRole.ADMIN]),
+  upload.array("images", 10),
   createProductImageValidation,
   createProductImageController,
 );

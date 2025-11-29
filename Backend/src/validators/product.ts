@@ -50,8 +50,6 @@ export const updateProductValidation = [
 
 export const createProductImageValidation = [
   body("productId").isUUID().withMessage("Valid product ID is required"),
-  body("imageUrl").isURL().withMessage("Valid image URL is required"),
-  body("publicId").optional().isString(),
 ];
 
 export const updateProductImageValidation = [

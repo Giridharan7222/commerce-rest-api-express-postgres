@@ -5,7 +5,7 @@ A RESTful API backend for a commerce application built with Node.js, TypeScript,
 - **Node.js** (v16 or higher)
 - **Yarn** package manager
 - **PostgreSQL** database
-- **Docker** (optional, for containerized setup)
+- **Docker** (for containerized setup)
 
 ## Tech Stack
 
@@ -22,6 +22,7 @@ A RESTful API backend for a commerce application built with Node.js, TypeScript,
 - **Swagger** - API documentation
 - **Stripe** - Payment processing
 - **Cloudinary** - Image and file management
+- **Multer** - File upload middleware
 
 ### Development Tools
 - **Yarn** - Package manager
@@ -73,6 +74,7 @@ The application integrates **Stripe** for secure payment processing:
 For detailed setup, configuration, and usage instructions:
 - **Database setup & seeding**: [DB/README.md](./DB/README.md) - Includes pre-seeded test data
 - **Backend API setup & development**: [Backend/README.md](./Backend/README.md)
+- **🔗 API Documentation (Swagger)**: [http://localhost:5005/api-docs](http://localhost:5005/api-docs) - Interactive API documentation
 - **API flows & usage**: [Backend/FLOW.md](./Backend/FLOW.md)
 - **Database schema & migrations**: [DB/readme/DATABASE_SCHEMA.md](./DB/readme/DATABASE_SCHEMA.md)
 

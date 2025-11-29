@@ -1,4 +1,66 @@
 paths:
+  /api/products/upload:
+    post:
+      summary: Create product with file uploads (Admin only)
+      tags: [Products]
+      description: |
+        Create a new product with image uploads using Cloudinary for image storage and management.
+
+        **Cloudinary Integration:**
+        - Automatic image optimization and resizing
+        - CDN delivery for fast loading
+        - Secure cloud storage
+        - Multiple format support (JPEG, PNG, WebP)
+        - Automatic backup and redundancy
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - name
+                - price
+                - categoryId
+              properties:
+                name:
+                  type: string
+                  example: "iPhone 15 Pro"
+                description:
+                  type: string
+                  example: "Latest Apple smartphone"
+                price:
+                  type: number
+                  example: 999.99
+                stock:
+                  type: integer
+                  example: 50
+                categoryId:
+                  type: string
+                  format: uuid
+                isActive:
+                  type: boolean
+                  default: true
+                mainImage:
+                  type: string
+                  format: binary
+                  description: "Main product image (max 1 file) - uploaded to Cloudinary"
+                additionalImages:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: "Additional product images (max 10 files) - uploaded to Cloudinary"
+      responses:
+        "201":
+          description: Product created successfully with uploaded images
+        "400":
+          description: Validation error or upload failed
+        "403":
+          description: Access denied
+
   /api/products:
     post:
       summary: Create a new product (Admin only)
@@ -151,59 +213,6 @@ paths:
                         totalItems: 50
                         itemsPerPage: 10
 
-  /api/products/upload:
-    post:
-      summary: Create product with file uploads (Admin only)
-      tags: [Products]
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              required:
-                - name
-                - price
-                - categoryId
-              properties:
-                name:
-                  type: string
-                  example: "iPhone 15 Pro"
-                description:
-                  type: string
-                  example: "Latest Apple smartphone"
-                price:
-                  type: number
-                  example: 999.99
-                stock:
-                  type: integer
-                  example: 50
-                categoryId:
-                  type: string
-                  format: uuid
-                isActive:
-                  type: boolean
-                  default: true
-                mainImage:
-                  type: string
-                  format: binary
-                  description: "Main product image (max 1 file)"
-                additionalImages:
-                  type: array
-                  items:
-                    type: string
-                    format: binary
-                  description: "Additional product images (max 10 files)"
-      responses:
-        "201":
-          description: Product created successfully with uploaded images
-        "400":
-          description: Validation error or upload failed
-        "403":
-          description: Access denied
-
   /api/products/{id}:
     get:
       summary: Get product by ID
@@ -288,33 +297,43 @@ paths:
 
   /api/product-images:
     post:
-      summary: Create product image (Admin only)
+      summary: Upload multiple product images (Admin only)
       tags: [Product Images]
+      description: |
+        Upload multiple images for an existing product to the product_images table using Cloudinary storage.
+
+        **Cloudinary Integration:**
+        - Automatic image optimization
+        - CDN delivery
+        - Secure cloud storage
+        - Multiple images (max 10)
       security:
         - bearerAuth: []
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               required:
                 - productId
-                - imageUrl
+                - images
               properties:
                 productId:
                   type: string
                   format: uuid
-                imageUrl:
-                  type: string
-                  format: uri
-                publicId:
-                  type: string
+                  description: "UUID of the existing product"
+                images:
+                  type: array
+                  items:
+                    type: string
+                    format: binary
+                  description: "Multiple image files to upload to Cloudinary (max 10)"
       responses:
         "201":
-          description: Product image created successfully
+          description: Product images uploaded successfully
         "400":
-          description: Validation error
+          description: Validation error or upload failed
         "403":
           description: Access denied
 

@@ -113,13 +113,13 @@ Backend/
 
 3. **Access the application:**
    - API Server: http://localhost:5005
-   - API Documentation: http://localhost:5005/api-docs
+   - **🔗 API Documentation (Swagger)**: [http://localhost:5005/api-docs](http://localhost:5005/api-docs)
 
-### API Documentation
+### 📚 API Documentation
 
-The API uses Swagger for documentation. Once the server is running, visit:
+The API uses **Swagger** for interactive documentation. Once the server is running, visit:
 
-- **Swagger UI**: http://localhost:5005/api-docs
+- **🔗 Swagger UI**: [http://localhost:5005/api-docs](http://localhost:5005/api-docs) - Complete interactive API documentation
 
 ### Testing
 

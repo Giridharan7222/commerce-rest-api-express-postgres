@@ -235,7 +235,29 @@ export async function deleteProduct(productId: string) {
   return { message: "Product deleted successfully" };
 }
 
-export async function createProductImage(dto: CreateProductImageDto) {
+export async function createProductImage(
+  productId: string,
+  files: Express.Multer.File[],
+) {
+  const product = await Product.findByPk(productId);
+  if (!product) {
+    throw new Error("Product not found");
+  }
+
+  const imagePromises = files.map(async (file) => {
+    const uploadResult = await uploadFile(file, "products");
+    return ProductImage.create({
+      productId,
+      imageUrl: uploadResult.imageUrl,
+      publicId: uploadResult.publicId,
+    } as any);
+  });
+
+  const productImages = await Promise.all(imagePromises);
+  return productImages.map((image: any) => image.get({ plain: true }));
+}
+
+export async function createProductImageFromUrl(dto: CreateProductImageDto) {
   const product = await Product.findByPk(dto.productId);
   if (!product) {
     throw new Error("Product not found");

@@ -8,6 +8,7 @@ import {
   updateProduct,
   deleteProduct,
   createProductImage,
+  createProductImageFromUrl,
   getProductImages,
   updateProductImage,
   deleteProductImage,
@@ -128,10 +129,22 @@ export const createProductImageController = async (
   if (handleValidationErrors(req, res)) return;
 
   try {
-    const productImage = await createProductImage(req.body);
+    const files = req.files as Express.Multer.File[];
+    const productId = req.body.productId;
+
+    if (!files || files.length === 0) {
+      return (res as any).fail(
+        "No images provided",
+        "NO_IMAGES_ERROR",
+        "At least one image file is required",
+        400,
+      );
+    }
+
+    const productImages = await createProductImage(productId, files);
     return (res as any).success(
-      "Product image created successfully",
-      productImage,
+      "Product images created successfully",
+      productImages,
       201,
     );
   } catch (error) {
